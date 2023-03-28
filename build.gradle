@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group 'com.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.kafka:kafka-clients:3.4.0'
+    implementation 'org.apache.kafka:connect-api:3.4.0'
+    implementation 'org.apache.kafka:connect-json:3.4.0'
+    implementation 'org.apache.jena:jena-arq:4.7.0'
+    implementation 'org.apache.jena:jena-core:4.7.0'
+    implementation 'org.apache.jena:jena-shaded-guava:4.7.0'
+    implementation 'org.eclipse.jetty:jetty-client:11.0.14'
+    // logging
+    implementation 'org.slf4j:slf4j-simple:2.0.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    // Use assertj for testing.
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+
+    // Use underscore for testing.
+    testImplementation 'com.github.javadev:underscore:1.87'
+
+    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+    compileOnly "com.google.code.findbugs:annotations:3.0.1"
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
