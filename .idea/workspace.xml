@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="Initial commit with first unit tests OK.">
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/converter/RecordValueConverterTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/AccessTokenHttpRequestBuilderTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/ApiKeyAccessTokenHttpRequestBuilderTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSenderTest.java" afterDir="false" />
+    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="All unit tests OK">
+      <change afterPath="$PROJECT_DIR$/.github/workflow/build.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,11 +73,12 @@
   "keyToString": {
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/dferh/IdeaProjects/RdfKafkaSinkConnector/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender",
+    "last_opened_file_path": "C:/Users/dferh/IdeaProjects/RdfKafkaSinkConnector",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -95,7 +92,7 @@
       <recent name="org.geovistory.kafka.sink.connector.rdf" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.OAuth2HttpSenderTest">
+  <component name="RunManager" selected="Gradle.Tests in 'RdfKafkaSinkConnector.test'">
     <configuration name="HttpSinkConfigTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -110,29 +107,6 @@
             <option value=":test" />
             <option value="--tests" />
             <option value="&quot;org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfigTest&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
-    </configuration>
-    <configuration name="HttpSinkConfigTest.supportedAuthorizationType" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfigTest.supportedAuthorizationType&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -188,6 +162,27 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="Tests in 'RdfKafkaSinkConnector.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
     <configuration name="Tests in 'org.geovistory.kafka.sink.connector.rdf.sender'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -213,11 +208,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.Tests in 'RdfKafkaSinkConnector.test'" />
         <item itemvalue="Gradle.OAuth2HttpSenderTest" />
         <item itemvalue="Gradle.Tests in 'org.geovistory.kafka.sink.connector.rdf.sender'" />
         <item itemvalue="Gradle.RecordValueConverterTest" />
         <item itemvalue="Gradle.HttpSinkConfigTest" />
-        <item itemvalue="Gradle.HttpSinkConfigTest.supportedAuthorizationType" />
       </list>
     </recent_temporary>
   </component>
@@ -229,7 +224,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1680010780025</updated>
-      <workItem from="1680010782754" duration="11854000" />
+      <workItem from="1680010782754" duration="14675000" />
+      <workItem from="1680593116057" duration="831000" />
+      <workItem from="1680619504985" duration="620000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit with first unit tests OK.">
       <created>1680019850613</created>
@@ -238,7 +235,14 @@
       <option name="project" value="LOCAL" />
       <updated>1680019850613</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="All unit tests OK">
+      <created>1680104842289</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1680104842289</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -257,6 +261,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit with first unit tests OK." />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit with first unit tests OK." />
+    <MESSAGE value="All unit tests OK" />
+    <option name="LAST_COMMIT_MESSAGE" value="All unit tests OK" />
   </component>
 </project>
