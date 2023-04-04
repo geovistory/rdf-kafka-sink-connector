@@ -13,7 +13,7 @@ on:
       versionIncrementBranch:
         description: 'The branch where the version increment will be committed and pushed'
         required: true
-        default: 'master'
+        default: 'main'
 jobs:
   incrementVersion:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       # https://github.com/actions/setup-java
-      - uses: actions/setup-java@v2
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
