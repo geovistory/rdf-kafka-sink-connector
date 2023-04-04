@@ -1,11 +1,23 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.dipien:semantic-version-gradle-plugin:2.0.0"
+    }
+}
+
 plugins {
     id 'java'
-    // used to set semantic version
-    id 'com.glovoapp.semantic-versioning' version '1.1.10'
 }
 
 group 'org.geovistory'
 version '0.0.1'
+
+apply plugin: "com.dipien.semantic-version"
+
 
 repositories {
     mavenCentral()
@@ -19,9 +31,11 @@ dependencies {
     implementation 'org.apache.jena:jena-core:4.7.0'
     implementation 'org.apache.jena:jena-shaded-guava:4.7.0'
     implementation 'org.eclipse.jetty:jetty-client:11.0.14'
+
     // logging
     implementation 'org.slf4j:slf4j-simple:2.0.5'
 
+    //testing
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.2'
@@ -43,3 +57,4 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
