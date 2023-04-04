@@ -53,6 +53,12 @@ dependencies {
     compileOnly "com.google.code.findbugs:annotations:3.0.1"
 }
 
+processResources {
+    filesMatching('rdf-kafka-sink-connector-version.properties') {
+        expand([version: version])
+    }
+}
+
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()

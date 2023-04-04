@@ -25,7 +25,7 @@ import java.util.Properties;
 class Version {
     private static final Logger log = LoggerFactory.getLogger(Version.class);
 
-    private static final String PROPERTIES_FILENAME = "http-connector-for-apache-kafka-version.properties";
+    private static final String PROPERTIES_FILENAME = "rdf-kafka-sink-connector-version.properties";
 
     static final String VERSION;
 
