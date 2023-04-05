@@ -12,12 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Set VERSION_INFORMATION
-      - run: echo "VERSION_INFORMATION=$(${{github.workspace}}/gradlew -q printVersionInformation)" >> $GITHUB_ENV
+      # Set VERSION_NAME
+      - run: echo "VERSION_NAME=$(${{github.workspace}}/gradlew -q printVersionName)" >> $GITHUB_ENV
 
       - name: Prints version information
-        run: echo Version is '${{ env.VERSION_INFORMATION }}'
+        run: echo Version is '${{ env.VERSION_NAME }}'
 
       - uses: ncipollo/release-action@v1
         with:
-          tag: ${{ env.VERSION_INFORMATION }}
+          tag: ${{ env.VERSION_NAME }}
