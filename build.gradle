@@ -11,11 +11,12 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 group 'org.geovistory'
 
-version = "0.3.0"
+version = "0.4.0"
 apply plugin: "com.dipien.semantic-version"
 
 
@@ -62,5 +63,23 @@ processResources {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/geovistory/rdf-kafka-sink-connector")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
