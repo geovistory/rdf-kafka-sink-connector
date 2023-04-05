@@ -10,13 +10,6 @@ on:
           - MAJOR
           - MINOR
           - PATCH
-      betaTag:
-        description: 'Is the version is a beta or not'
-        type: choice
-        required: true
-        options:
-          - true
-          - false
       versionIncrementBranch:
         description: 'The branch where the version increment will be committed and pushed'
         required: true
@@ -36,7 +29,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - run: ./gradlew incrementVersion --versionIncrementType=${{ github.event.inputs.versionIncrementType }} --versionIncrementBranch=${{ github.event.inputs.versionIncrementBranch }} --beta=${{ github.event.inputs.betaTag }}
+      - run: ./gradlew incrementVersion --versionIncrementType=${{ github.event.inputs.versionIncrementType }} --versionIncrementBranch=${{ github.event.inputs.versionIncrementBranch }}
         env:
           gitUserEmail: 'github.bot@geovistory.org'
           gitUserName: 'geovbot'
