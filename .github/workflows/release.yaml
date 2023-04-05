@@ -1,0 +1,23 @@
+name: Releases
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      # Set VERSION_INFORMATION
+      - run: echo "VERSION_INFORMATION=$(${{github.workspace}}/gradlew -q printVersionInformation)" >> $GITHUB_ENV
+
+      - name: Prints version information
+        run: echo Version is '${{ env.VERSION_INFORMATION }}'
+
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.VERSION_INFORMATION }}
