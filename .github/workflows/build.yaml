@@ -7,13 +7,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_DEVOPS_CHANNEL_WEBHOOK }}
+          title: "Start building rdf-kafka-sink-connector app"
+          color: 0xffed2b
+          username: GitHub Actions
+
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
@@ -22,3 +33,13 @@ jobs:
         with:
           name: Package
           path: build/libs
+
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_DEVOPS_CHANNEL_WEBHOOK }}
+          title: "Done: Building and packaging rdf-kafka-sink-connector app"
+          description: ""
+          color: 0x0000ff
+          username: GitHub Actions
