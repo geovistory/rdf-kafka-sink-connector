@@ -72,7 +72,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/geovistory/rdf-kafka-sink-connector")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                password = System.getenv("DF_PAT")
             }
         }
     }
