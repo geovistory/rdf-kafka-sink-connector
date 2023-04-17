@@ -19,5 +19,7 @@ jobs:
         run: echo Version is '${{ env.VERSION_NAME }}'
 
       - uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.DF_PAT }}
         with:
           tag: ${{ env.VERSION_NAME }}
