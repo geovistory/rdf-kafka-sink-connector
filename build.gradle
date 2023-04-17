@@ -16,7 +16,7 @@ plugins {
 
 group 'org.geovistory'
 
-version = "0.5.6"
+version = "0.5.7"
 apply plugin: "com.dipien.semantic-version"
 
 
