@@ -21,4 +21,4 @@ jobs:
         with:
           arguments: publish
         env:
-          GITHUB_TOKEN: ${{ secrets.DJAMEL_PRIVATE_REPOS_PAT || secrets.JONAS_PRIVATE_REPOS_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
