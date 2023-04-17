@@ -14,7 +14,7 @@ plugins {
     id 'maven-publish'
 }
 
-//group 'org.geovistory'
+group 'org.geovistory'
 
 version = "0.5.8"
 apply plugin: "com.dipien.semantic-version"
