@@ -22,4 +22,4 @@ jobs:
         with:
           tag: ${{ env.VERSION_NAME }}
         env:
-          GITHUB_TOKEN: ${{ secrets.DF_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GEOVBOT_PAT }}
