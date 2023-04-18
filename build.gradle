@@ -14,7 +14,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'rdf-kafka-sink-connector'
+group 'org.geovistory'
 
 version = "0.5.12"
 apply plugin: "com.dipien.semantic-version"
@@ -66,12 +66,6 @@ tasks.named('test') {
 }
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-
     repositories {
         maven {
             name = "GitHubPackages"
@@ -79,6 +73,14 @@ publishing {
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        register("jar", MavenPublication) {
+            from(components["java"])
+            pom {
+                url.set("https://github.com/geovistory/rdf-kafka-sink-connector.git")
             }
         }
     }
