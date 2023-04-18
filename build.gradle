@@ -14,7 +14,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'org.geovistory'
+group 'rdf-kafka-sink-connector'
 
 version = "0.5.11"
 apply plugin: "com.dipien.semantic-version"
