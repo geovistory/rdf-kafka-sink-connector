@@ -16,7 +16,7 @@ plugins {
 
 group 'org.geovistory'
 
-version = "0.5.13"
+version = "0.5.14"
 apply plugin: "com.dipien.semantic-version"
 
 
@@ -86,4 +86,3 @@ publishing {
 task printVersionName {
     println 'v'+project.version
 }
-
