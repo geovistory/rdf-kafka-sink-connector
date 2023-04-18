@@ -77,11 +77,8 @@ publishing {
         }
     }
     publications {
-        register("jar", MavenPublication) {
-            from(components["java"])
-            pom {
-                url.set("https://github.com/geovistory/rdf-kafka-sink-connector.git")
-            }
+        maven(MavenPublication) {
+            from components.java
         }
     }
 }
