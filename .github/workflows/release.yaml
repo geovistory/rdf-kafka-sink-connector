@@ -10,16 +10,38 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_DEVOPS_CHANNEL_WEBHOOK }}
+          title: "Start new release of rdf-kafka-sink-connector"
+          color: 0xffed2b
+          username: GitHub Actions
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       # Set VERSION_NAME
-      - run: echo "VERSION_NAME=$(${{github.workspace}}/gradlew -q printVersionName)" >> $GITHUB_ENV
+      - name: Set version name to environment variable
+        run: echo "VERSION_NAME=$(${{github.workspace}}/gradlew -q printVersionName)" >> $GITHUB_ENV
 
       - name: Prints version information
         run: echo Version is '${{ env.VERSION_NAME }}'
 
-      - uses: ncipollo/release-action@v1
+      - name: Release action
+        uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.VERSION_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GEOVBOT_PAT }}
+
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_DEVOPS_CHANNEL_WEBHOOK }}
+          title: "Done: New release of rdf-kafka-sink-connector"
+          description: ""
+          color: 0x0000ff
+          username: GitHub Actions

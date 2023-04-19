@@ -9,6 +9,15 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_DEVOPS_CHANNEL_WEBHOOK }}
+          title: "Start publishing new package of rdf-kafka-sink-connector"
+          color: 0xffed2b
+          username: GitHub Actions
+
       - name: Checkout code 
         uses: actions/checkout@v3
         
@@ -32,3 +41,13 @@ jobs:
           arguments: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GEOVBOT_PAT }}
+
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_DEVOPS_CHANNEL_WEBHOOK }}
+          title: "Done: publishing of new package of rdf-kafka-sink-connector"
+          description: ""
+          color: 0x0000ff
+          username: GitHub Actions
