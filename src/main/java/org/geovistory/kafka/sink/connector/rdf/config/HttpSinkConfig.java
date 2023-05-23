@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 public class HttpSinkConfig extends AbstractConfig {
     private static final String CONNECTION_GROUP = "Connection";
     private static final String HTTP_URL_CONFIG = "http.url";
+    private static final String HTTP_ENDPOINT = "http.endpoint";
 
     private static final String HTTP_AUTHORIZATION_TYPE_CONFIG = "http.authorization.type";
     private static final String HTTP_HEADERS_AUTHORIZATION_CONFIG = "http.headers.authorization";
@@ -96,6 +97,19 @@ public class HttpSinkConfig extends AbstractConfig {
             groupCounter++,
             ConfigDef.Width.LONG,
             HTTP_URL_CONFIG
+        );
+
+        configDef.define(
+                HTTP_ENDPOINT,
+                ConfigDef.Type.STRING,
+                null,
+                new NonBlankStringValidator(true),
+                ConfigDef.Importance.HIGH,
+                "The endpoint to send SPARQL query to.",
+                CONNECTION_GROUP,
+                groupCounter++,
+                ConfigDef.Width.LONG,
+                HTTP_ENDPOINT
         );
 
         configDef.define(
@@ -545,7 +559,12 @@ public class HttpSinkConfig extends AbstractConfig {
     }
 
     public final URI httpUri() {
-        return toURI(HTTP_URL_CONFIG);
+        var uri = "";
+        if (!HTTP_URL_CONFIG.substring(HTTP_URL_CONFIG.length() - 1).equals("/")){
+            uri = HTTP_URL_CONFIG+"/"+HTTP_ENDPOINT;
+        }
+        else uri = HTTP_URL_CONFIG+HTTP_ENDPOINT;
+        return toURI(uri);
     }
 
     public final Long kafkaRetryBackoffMs() {

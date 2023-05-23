@@ -18,6 +18,7 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfig;
+import org.geovistory.kafka.sink.connector.rdf.converter.RecordKeyConverter;
 import org.geovistory.kafka.sink.connector.rdf.converter.RecordValueConverter;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
 
@@ -28,6 +29,7 @@ public abstract class RecordSender {
     protected final HttpSender httpSender;
 
     protected final RecordValueConverter recordValueConverter = new RecordValueConverter();
+    protected final RecordKeyConverter recordKeyConverter = new RecordKeyConverter();
 
     protected RecordSender(final HttpSender httpSender) {
         this.httpSender = httpSender;

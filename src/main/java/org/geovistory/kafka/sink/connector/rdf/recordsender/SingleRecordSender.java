@@ -19,6 +19,10 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
 
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 
 final class SingleRecordSender extends RecordSender {
@@ -27,17 +31,43 @@ final class SingleRecordSender extends RecordSender {
         super(httpSender);
     }
 
+    private static final Logger log = LoggerFactory.getLogger(SingleRecordSender.class);
+
     @Override
     public void send(final Collection<SinkRecord> records) {
         for (final SinkRecord record : records) {
-            final String body = recordValueConverter.convert(record);
-            httpSender.send(body);
+            prepareAndSendBody(record);
         }
     }
 
     @Override
     public void send(final SinkRecord record) {
-        final String body = recordValueConverter.convert(record);
+        log.info(recordKeyConverter.convert(record));
+        prepareAndSendBody(record);
+    }
+
+    private void prepareAndSendBody(SinkRecord record) {
+        var paramName = "update";
+        var sparqlQuery = "";
+        var jsonKey = new JSONObject(recordKeyConverter.convert(record));
+        var projectId = jsonKey.get("project_id").toString();
+        var turtle = jsonKey.get("turtle").toString();
+
+        var jsonValue = new JSONObject(recordValueConverter.convert(record));
+        var operation = jsonValue.get("operation").toString();
+
+        log.info("operation: "+operation);
+        log.info("projectId: "+projectId);
+        log.info("turtle: "+turtle);
+
+        if (operation.equals("insert")) {
+            sparqlQuery = "INSERT DATA { "+turtle+ "}";
+        }
+        else if (operation.equals("delete")) {
+            sparqlQuery = "DELETE DATA { "+turtle+ "}";
+        }
+        var body = paramName+"="+sparqlQuery;
+        log.info(paramName+"="+sparqlQuery);
         httpSender.send(body);
     }
 }

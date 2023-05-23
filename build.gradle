@@ -12,16 +12,33 @@ buildscript {
 plugins {
     id 'java'
     id 'maven-publish'
+    // https://docs.gradle.org/current/userguide/java_library_plugin.html
+    id 'java-library'
+
+    // https://docs.gradle.org/current/userguide/distribution_plugin.html
+    id 'distribution'
+
+    // https://docs.gradle.org/current/userguide/idea_plugin.html
+    id 'idea'
 }
 
 group 'org.geovistory'
 
-version = "0.5.15"
+version = "0.6.2"
 apply plugin: "com.dipien.semantic-version"
 
 
 repositories {
     mavenCentral()
+}
+
+distributions {
+    main {
+        contents {
+            from jar
+            from configurations.runtimeClasspath
+        }
+    }
 }
 
 dependencies {
@@ -32,6 +49,9 @@ dependencies {
     implementation 'org.apache.jena:jena-core:4.7.0'
     implementation 'org.apache.jena:jena-shaded-guava:4.7.0'
     implementation 'org.eclipse.jetty:jetty-client:11.0.14'
+
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation 'org.json:json:20230227'
 
     // logging
     implementation 'org.slf4j:slf4j-simple:2.0.5'
