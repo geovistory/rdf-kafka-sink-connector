@@ -51,13 +51,13 @@ final class BatchRecordSender extends RecordSender {
             if (batch.size() >= batchMaxSize) {
                 final String body = createRequestBody(batch);
                 batch.clear();
-                httpSender.send(body);
+                httpSender.send(body, null);
             }
         }
 
         if (!batch.isEmpty()) {
             final String body = createRequestBody(batch);
-            httpSender.send(body);
+            httpSender.send(body, null);
         }
     }
 

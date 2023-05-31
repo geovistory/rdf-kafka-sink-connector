@@ -4,12 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="add PAT">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/build.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/build.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/increment_version.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/increment_version.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/publish_package.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/publish_package.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/release.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/release.yaml" afterDir="false" />
+    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="Commit for V0.6.3 with multiple project endpoints management">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/BatchRecordSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/BatchRecordSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/AccessTokenHttpRequestBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/AccessTokenHttpRequestBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/ApiKeyAccessTokenHttpRequestBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/ApiKeyAccessTokenHttpRequestBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpRequestBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpRequestBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/AccessTokenHttpRequestBuilderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/AccessTokenHttpRequestBuilderTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/ApiKeyAccessTokenHttpRequestBuilderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/ApiKeyAccessTokenHttpRequestBuilderTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSenderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSenderTest.java" afterDir="false" />
+    </list>
+    <list id="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" name="Changes by admin" comment="Changes by admin">
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/converter/RecordValueConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/converter/RecordValueConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/SingleRecordSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/SingleRecordSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +63,12 @@
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="build" type="c8890929:TasksNode$1" />
               </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="rdf-kafka-sink-connector" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="distribution" type="c8890929:TasksNode$1" />
+              </path>
             </expand>
             <select />
           </tree_state>
@@ -60,7 +84,39 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java">
+      <ranges>
+        <range start1="70" end1="70" start2="70" end2="72" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+        <range start1="74" end1="74" start2="76" end2="78" changelist="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" />
+        <range start1="75" end1="76" start2="79" end2="79" changelist="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/sender/HttpSender.java">
+      <ranges>
+        <range start1="38" end1="39" start2="38" end2="39" changelist="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" />
+        <range start1="62" end1="63" start2="62" end2="63" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+        <range start1="65" end1="66" start2="65" end2="66" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java">
+      <ranges>
+        <range start1="39" end1="40" start2="39" end2="40" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+        <range start1="113" end1="113" start2="113" end2="126" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+        <range start1="560" end1="561" start2="573" end2="580" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+        <range start1="562" end1="564" start2="581" end2="585" changelist="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" />
+        <range start1="565" end1="567" start2="586" end2="588" changelist="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" />
+        <range start1="568" end1="568" start2="589" end2="602" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+        <range start1="651" end1="651" start2="685" end2="693" changelist="95b03c1d-a893-4692-826c-93a6c69a816c" />
+      </ranges>
+    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -71,18 +127,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dferh/IdeaProjects/RdfKafkaSinkConnector&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "extract.method.default.visibility": "private",
+    "last_opened_file_path": "C:/Users/dferh/IdeaProjects/http-connector-for-apache-kafka",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\dferh\IdeaProjects\RdfKafkaSinkConnector\src\test\java\org\geovistory\kafka\sink\connector\rdf\sender" />
@@ -91,11 +148,12 @@
       <recent name="C:\Users\dferh\IdeaProjects\RdfKafkaSinkConnector\src\main\java\org\geovistory\kafka\sink\connector\rdf" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.geovistory.kafka.sink.connector.rdf.converter" />
       <recent name="org.geovistory.kafka.sink.connector.rdf" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Tests in 'RdfKafkaSinkConnector.test'">
-    <configuration name="HttpSinkConfigTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Gradle.HttpSinkConfigTest.correctMinimalConfig">
+    <configuration name="HttpSinkConfigTest.correctMinimalConfig" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -108,7 +166,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfigTest&quot;" />
+            <option value="&quot;org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfigTest.correctMinimalConfig&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -141,80 +199,76 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="RecordValueConverterTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="RdfKafkaSinkConnector [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
+        <option name="scriptParameters" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;org.geovistory.kafka.sink.connector.rdf.converter.RecordValueConverterTest&quot;" />
+            <option value="build" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="Tests in 'RdfKafkaSinkConnector.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="RdfKafkaSinkConnector [distTar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
+        <option name="scriptParameters" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value=":test" />
+            <option value="distTar" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="Tests in 'org.geovistory.kafka.sink.connector.rdf.sender'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="RdfKafkaSinkConnector [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
+        <option name="scriptParameters" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;org.geovistory.kafka.sink.connector.rdf.sender.*&quot;" />
+            <option value="jar" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.Tests in 'RdfKafkaSinkConnector.test'" />
+        <item itemvalue="Gradle.HttpSinkConfigTest.correctMinimalConfig" />
+        <item itemvalue="Gradle.RdfKafkaSinkConnector [build]" />
+        <item itemvalue="Gradle.RdfKafkaSinkConnector [jar]" />
         <item itemvalue="Gradle.OAuth2HttpSenderTest" />
-        <item itemvalue="Gradle.Tests in 'org.geovistory.kafka.sink.connector.rdf.sender'" />
-        <item itemvalue="Gradle.RecordValueConverterTest" />
-        <item itemvalue="Gradle.HttpSinkConfigTest" />
+        <item itemvalue="Gradle.RdfKafkaSinkConnector [distTar]" />
       </list>
     </recent_temporary>
   </component>
@@ -229,6 +283,10 @@
       <workItem from="1680010782754" duration="14675000" />
       <workItem from="1680593116057" duration="831000" />
       <workItem from="1680619504985" duration="620000" />
+      <workItem from="1683295969208" duration="5654000" />
+      <workItem from="1684856263428" duration="4769000" />
+      <workItem from="1685022337846" duration="5337000" />
+      <workItem from="1685431906812" duration="1938000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit with first unit tests OK.">
       <created>1680019850613</created>
@@ -244,11 +302,36 @@
       <option name="project" value="LOCAL" />
       <updated>1680104842289</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Improved worflow files">
+      <created>1681889436229</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1681889436229</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Commit for V0.6 and URI config in HttpSingConfig.java">
+      <created>1684856474162</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1684856474162</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -264,6 +347,35 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit with first unit tests OK." />
     <MESSAGE value="All unit tests OK" />
-    <option name="LAST_COMMIT_MESSAGE" value="All unit tests OK" />
+    <MESSAGE value="Improved worflow files" />
+    <MESSAGE value="Commit for V0.6 and URI config in HttpSingConfig.java" />
+    <MESSAGE value="Changes by admin" />
+    <MESSAGE value="Commit for V0.6.3 with multiple project endpoints management" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit for V0.6.3 with multiple project endpoints management" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java</url>
+          <line>76</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java</url>
+          <line>599</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java</url>
+          <line>600</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

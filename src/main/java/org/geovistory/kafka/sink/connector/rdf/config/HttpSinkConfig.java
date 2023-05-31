@@ -37,7 +37,7 @@ public class HttpSinkConfig extends AbstractConfig {
     private static final String CONNECTION_GROUP = "Connection";
     private static final String HTTP_URL_CONFIG = "http.url";
     private static final String HTTP_ENDPOINT = "http.endpoint";
-
+    private static final String HTTP_PROJECTS_ENDPOINT = "http.projects.endpoint";
     private static final String HTTP_AUTHORIZATION_TYPE_CONFIG = "http.authorization.type";
     private static final String HTTP_HEADERS_AUTHORIZATION_CONFIG = "http.headers.authorization";
     private static final String HTTP_HEADERS_CONTENT_TYPE_CONFIG = "http.headers.content.type";
@@ -110,6 +110,19 @@ public class HttpSinkConfig extends AbstractConfig {
                 groupCounter++,
                 ConfigDef.Width.LONG,
                 HTTP_ENDPOINT
+        );
+
+        configDef.define(
+                HTTP_PROJECTS_ENDPOINT,
+                ConfigDef.Type.STRING,
+                null,
+                new NonBlankStringValidator(true),
+                ConfigDef.Importance.HIGH,
+                "A string to be concatenated with the project ID to point to the correct endpoint when the messages has a non null project ID.",
+                CONNECTION_GROUP,
+                groupCounter++,
+                ConfigDef.Width.LONG,
+                HTTP_PROJECTS_ENDPOINT
         );
 
         configDef.define(
@@ -558,13 +571,34 @@ public class HttpSinkConfig extends AbstractConfig {
 
     }
 
-    public final URI httpUri() {
+
+    public URI httpUri(String projectId) {
+        if(projectId==null)            return httpCommunityUri();
+        return httpProjectUri(projectId);
+    }
+
+    private URI httpCommunityUri() {
         var uri = "";
-        if (!HTTP_URL_CONFIG.substring(HTTP_URL_CONFIG.length() - 1).equals("/")){
-            uri = HTTP_URL_CONFIG+"/"+HTTP_ENDPOINT;
+        var httpUrlConfig = getString(HTTP_URL_CONFIG);
+        var httpEndpoint = getString(HTTP_ENDPOINT);
+        if (!httpUrlConfig.substring(httpUrlConfig.length() - 1).equals("/")){
+            uri = httpUrlConfig+"/"+httpEndpoint;
         }
-        else uri = HTTP_URL_CONFIG+HTTP_ENDPOINT;
-        return toURI(uri);
+        else uri = httpUrlConfig+httpEndpoint;
+        return toEndpointUri(uri);
+    }
+
+    private URI httpProjectUri(String projectId) {
+        var uri = "";
+        var httpUrlConfig = getString(HTTP_URL_CONFIG);
+        var httpProjectsEndpoint = getString(HTTP_PROJECTS_ENDPOINT);
+        var httpEndpoint = getString(HTTP_ENDPOINT);
+
+        if (!httpUrlConfig.substring(httpUrlConfig.length() - 1).equals("/")){
+            uri = httpUrlConfig+"/"+httpProjectsEndpoint+projectId;
+        }
+        else uri = httpUrlConfig+httpEndpoint+projectId;
+        return toEndpointUri(uri);
     }
 
     public final Long kafkaRetryBackoffMs() {
@@ -647,6 +681,14 @@ public class HttpSinkConfig extends AbstractConfig {
             return new URL(getString(propertyName)).toURI();
         } catch (final MalformedURLException | URISyntaxException e) {
             throw new ConnectException(String.format("Could not retrieve proper URI from %s", propertyName), e);
+        }
+    }
+
+    private URI toEndpointUri(final String str) {
+        try {
+            return new URL(str).toURI();
+        } catch (final MalformedURLException | URISyntaxException e) {
+            throw new ConnectException(String.format("Could not retrieve proper URI from %s", str), e);
         }
     }
 

@@ -73,7 +73,7 @@ final class OAuth2HttpSender extends HttpSender {
             try {
                 final var response =
                         super.sendWithRetries(
-                                oauth2HttpRequestBuilder.build(config),
+                                oauth2HttpRequestBuilder.build(config, null),
                                 HttpResponseHandler.ON_HTTP_ERROR_RESPONSE_HANDLER
                         );
                 accessTokenAuthHeader = buildAccessTokenAuthHeader(response.body());

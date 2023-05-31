@@ -68,6 +68,7 @@ final class SingleRecordSender extends RecordSender {
         }
         var body = paramName+"="+sparqlQuery;
         log.info(paramName+"="+sparqlQuery);
-        httpSender.send(body);
+
+        httpSender.send(body, projectId);
     }
 }

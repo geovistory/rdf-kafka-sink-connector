@@ -57,7 +57,7 @@ class OAuth2HttpSenderTest {
         when(accessTokenResponse.body()).thenReturn(objectMapper.writeValueAsString(accessTokenJson));
         when(mockedHttpClient.<String>send(requestCaptor.capture(), any())).thenReturn(accessTokenResponse);
 
-        httpSend.send("SOME_BODY");
+        httpSend.send("SOME_BODY", null);
 
         final var r = requestCaptor.getAllValues().get(1);
         assertThat(r.headers().firstValue(HttpRequestBuilder.HEADER_AUTHORIZATION))
@@ -89,7 +89,7 @@ class OAuth2HttpSenderTest {
         when(accessTokenResponse.body()).thenReturn(objectMapper.writeValueAsString(accessTokenJson));
         when(mockedHttpClient.<String>send(requestCaptor.capture(), any())).thenReturn(accessTokenResponse);
 
-        httpSend.send("SOME_BODY");
+        httpSend.send("SOME_BODY", null);
 
         final var r = requestCaptor.getAllValues().get(1);
         assertThat(r.headers().firstValue(HttpRequestBuilder.HEADER_AUTHORIZATION))
@@ -122,7 +122,7 @@ class OAuth2HttpSenderTest {
         when(accessTokenResponse.body()).thenReturn(objectMapper.writeValueAsString(accessTokenJson));
         when(mockedHttpClient.<String>send(requestCaptor.capture(), any())).thenReturn(accessTokenResponse);
 
-        httpSend.send("SOME_BODY");
+        httpSend.send("SOME_BODY", null);
 
         final var r = requestCaptor.getAllValues().get(1);
         assertThat(r.headers().firstValue(HttpRequestBuilder.HEADER_CONTENT_TYPE))
@@ -149,9 +149,9 @@ class OAuth2HttpSenderTest {
         when(response.body()).thenReturn(objectMapper.writeValueAsString(accessTokenJson));
         when(mockedHttpClient.<String>send(requestCaptor.capture(), any())).thenReturn(response);
 
-        httpSend.send("SOME_BODY");
+        httpSend.send("SOME_BODY", null);
         verify(mockedHttpClient, times(2)).send(any(HttpRequest.class), any());
-        httpSend.send("SOME_BODY");
+        httpSend.send("SOME_BODY", null);
         verify(mockedHttpClient, times(3)).send(any(HttpRequest.class), any());
 
     }
@@ -210,9 +210,9 @@ class OAuth2HttpSenderTest {
                     }
                 });
 
-        httpSend.send("SOME_BODY_1");
-        httpSend.send("SOME_BODY_2");
-        httpSend.send("SOME_BODY_3");
+        httpSend.send("SOME_BODY_1", null);
+        httpSend.send("SOME_BODY_2", null);
+        httpSend.send("SOME_BODY_3", null);
 
         assertThat(requestCaptor.getAllValues())
                 .map(HttpRequest::uri)
@@ -244,7 +244,7 @@ class OAuth2HttpSenderTest {
                 .thenReturn(response);
 
         assertThatExceptionOfType(ConnectException.class)
-                .isThrownBy(() -> httpSend.send("SOME_BODY"))
+                .isThrownBy(() -> httpSend.send("SOME_BODY", null))
                 .withMessage("Sending failed and no retries remain, stopping");
     }
 
@@ -299,8 +299,8 @@ class OAuth2HttpSenderTest {
 
         assertThatExceptionOfType(ConnectException.class)
                 .isThrownBy(() -> {
-                    httpSend.send("SOME_BODY_1");
-                    httpSend.send("SOME_BODY_2");
+                    httpSend.send("SOME_BODY_1", null);
+                    httpSend.send("SOME_BODY_2", null);
                 })
                 .withMessage("Sending failed and no retries remain, stopping");
     }

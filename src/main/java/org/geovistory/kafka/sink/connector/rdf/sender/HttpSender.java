@@ -36,7 +36,7 @@ public class HttpSender {
 
     protected final HttpSinkConfig config;
 
-    private final HttpRequestBuilder httpRequestBuilder;
+    public HttpRequestBuilder httpRequestBuilder;
 
     protected HttpSender(final HttpSinkConfig config) {
         this(config, HttpRequestBuilder.DEFAULT_HTTP_REQUEST_BUILDER);
@@ -60,10 +60,10 @@ public class HttpSender {
         this.httpClient = httpClient;
     }
 
-    public final void send(final String body) {
+    public final void send(final String body, String projectId) {
         final var requestBuilder =
                 httpRequestBuilder
-                        .build(config)
+                        .build(config, projectId)
                         .POST(HttpRequest.BodyPublishers.ofString(body));
         sendWithRetries(requestBuilder, HttpResponseHandler.ON_HTTP_ERROR_RESPONSE_HANDLER);
     }

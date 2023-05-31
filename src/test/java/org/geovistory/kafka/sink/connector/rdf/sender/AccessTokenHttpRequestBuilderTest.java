@@ -19,7 +19,7 @@ class AccessTokenHttpRequestBuilderTest {
     @Test
     void shouldThrowExceptionWithoutConfig() {
         final Exception thrown = assertThrows(NullPointerException.class, () ->
-                new AccessTokenHttpRequestBuilder().build(null).build()
+                new AccessTokenHttpRequestBuilder().build(null, null).build()
         );
         assertEquals("config should not be null", thrown.getMessage());
     }
@@ -36,7 +36,7 @@ class AccessTokenHttpRequestBuilderTest {
         final HttpSinkConfig config = new HttpSinkConfig(configBase);
 
         final Exception thrown = assertThrows(IllegalArgumentException.class, () ->
-                new AccessTokenHttpRequestBuilder().build(config).build()
+                new AccessTokenHttpRequestBuilder().build(config, null).build()
         );
         assertEquals("The expected authorization type is oauth2", thrown.getMessage());
     }
@@ -52,7 +52,7 @@ class AccessTokenHttpRequestBuilderTest {
         );
         final HttpSinkConfig config = new HttpSinkConfig(configBase);
         final var accessTokenRequest =
-                new AccessTokenHttpRequestBuilder().build(config).build();
+                new AccessTokenHttpRequestBuilder().build(config, null).build();
 
         assertThat(accessTokenRequest.uri()).isEqualTo(new URL("http://localhost:42/token").toURI());
 
@@ -84,7 +84,7 @@ class AccessTokenHttpRequestBuilderTest {
         );
         final HttpSinkConfig config = new HttpSinkConfig(configBase);
         final var accessTokenRequest =
-                new AccessTokenHttpRequestBuilder().build(config).build();
+                new AccessTokenHttpRequestBuilder().build(config, null).build();
 
         assertThat(accessTokenRequest.uri()).isEqualTo(new URL("http://localhost:42/token").toURI());
 

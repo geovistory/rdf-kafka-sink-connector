@@ -25,7 +25,7 @@ class ApiKeyAccessTokenHttpRequestBuilderTest {
         );
         final HttpSinkConfig config = new HttpSinkConfig(configBase);
         final var accessTokenRequest =
-                new ApiKeyAccessTokenHttpRequestBuilder().build(config).build();
+                new ApiKeyAccessTokenHttpRequestBuilder().build(config, null).build();
 
         assertThat(accessTokenRequest.uri()).isEqualTo(new URL("http://localhost:42/token").toURI());
 
@@ -41,7 +41,7 @@ class ApiKeyAccessTokenHttpRequestBuilderTest {
     @Test
     void shouldThrowExceptionWithoutConfig() {
         final Exception thrown = assertThrows(NullPointerException.class, () ->
-            new ApiKeyAccessTokenHttpRequestBuilder().build(null).build()
+            new ApiKeyAccessTokenHttpRequestBuilder().build(null, null).build()
         );
         assertEquals("config should not be null", thrown.getMessage());
     }
@@ -58,7 +58,7 @@ class ApiKeyAccessTokenHttpRequestBuilderTest {
         final HttpSinkConfig config = new HttpSinkConfig(configBase);
 
         final Exception thrown = assertThrows(IllegalArgumentException.class, () ->
-            new ApiKeyAccessTokenHttpRequestBuilder().build(config).build()
+            new ApiKeyAccessTokenHttpRequestBuilder().build(config, null).build()
         );
         assertEquals("The expected authorization type is apikey", thrown.getMessage());
     }
