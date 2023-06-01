@@ -19,6 +19,7 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,8 +46,54 @@ final class BatchRecordSender extends RecordSender {
 
     @Override
     public void send(final Collection<SinkRecord> records) {
-        final List<SinkRecord> batch = new ArrayList<>(batchMaxSize);
+        //final List<SinkRecord> batch = new ArrayList<>(batchMaxSize);
+        List<List<SinkRecord>> batches = new ArrayList<>();
+        List<SinkRecord> currentBatch = new ArrayList<>(batchMaxSize);
+        String currentOperation = null;
+        String currentProjectId = null;
+
         for (final var record : records) {
+            var jsonKey = new JSONObject(recordKeyConverter.convert(record));
+            var projectId = jsonKey.get("project_id").toString();
+            var turtle = jsonKey.get("turtle").toString();
+
+            var jsonValue = new JSONObject(recordValueConverter.convert(record));
+            var operation = jsonValue.get("operation").toString();
+
+            if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
+                // Create a new batch if:
+                // - Operation is different from the current batch, or
+                // - Project ID is different from the current batch, or
+                // - Current batch size exceeds the maximum batch size
+
+                if (!currentBatch.isEmpty()) {
+                    // Add the current batch to the list of batches
+                    batches.add(new ArrayList<>(currentBatch));
+                    currentBatch.clear();
+                }
+
+                // Start a new batch with the current message
+                currentOperation = operation;
+                currentProjectId = projectId;
+                currentBatch.add(record);
+            } else {
+                // Add the message to the current batch
+                currentBatch.add(record);
+            }
+        }
+
+        // Add the last batch to the list of batches
+        if (!currentBatch.isEmpty()) {
+            batches.add(new ArrayList<>(currentBatch));
+        }
+
+        for (List<SinkRecord> batch : batches) {
+            final String body = createRequestBody(batch);
+            //httpSender.send(body, batch.);
+        }
+
+        for (var record : records) {
+
             batch.add(record);
             if (batch.size() >= batchMaxSize) {
                 final String body = createRequestBody(batch);
