@@ -89,22 +89,10 @@ final class BatchRecordSender extends RecordSender {
 
         for (List<SinkRecord> batch : batches) {
             final String body = createRequestBody(batch);
-            //httpSender.send(body, batch.);
-        }
-
-        for (var record : records) {
-
-            batch.add(record);
-            if (batch.size() >= batchMaxSize) {
-                final String body = createRequestBody(batch);
-                batch.clear();
-                httpSender.send(body, null);
-            }
-        }
-
-        if (!batch.isEmpty()) {
-            final String body = createRequestBody(batch);
-            httpSender.send(body, null);
+            var firstRecord = batch.get(0);
+            var jsonKey = new JSONObject(recordKeyConverter.convert(firstRecord));
+            var projectId = jsonKey.get("project_id").toString();
+            httpSender.send(body, projectId);
         }
     }
 
@@ -114,6 +102,7 @@ final class BatchRecordSender extends RecordSender {
     }
 
     private String createRequestBody(final Collection<SinkRecord> batch) {
+        //TODO change the way the body is build to have the correct SPARQL query
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);

@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="Commit for V0.6.3 with multiple project endpoints management">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/BatchRecordSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/BatchRecordSender.java" afterDir="false" />
-    </list>
+    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="Commit for batch management" />
     <list id="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" name="Changes by admin" comment="Changes by admin" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,7 +237,7 @@
       <workItem from="1684856263428" duration="4769000" />
       <workItem from="1685022337846" duration="5337000" />
       <workItem from="1685431906812" duration="5158000" />
-      <workItem from="1685540464427" duration="5037000" />
+      <workItem from="1685540464427" duration="5226000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit with first unit tests OK.">
       <created>1680019850613</created>
@@ -271,7 +267,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684856474162</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Commit for batch management">
+      <created>1685634510014</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1685634510014</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -306,7 +309,8 @@
     <MESSAGE value="Commit for V0.6 and URI config in HttpSingConfig.java" />
     <MESSAGE value="Changes by admin" />
     <MESSAGE value="Commit for V0.6.3 with multiple project endpoints management" />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit for V0.6.3 with multiple project endpoints management" />
+    <MESSAGE value="Commit for batch management" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit for batch management" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
