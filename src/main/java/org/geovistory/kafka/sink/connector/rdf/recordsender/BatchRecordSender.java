@@ -19,6 +19,9 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +33,7 @@ final class BatchRecordSender extends RecordSender {
     private final String batchPrefix;
     private final String batchSuffix;
     private final String batchSeparator;
+    private static final Logger log = LoggerFactory.getLogger(BatchRecordSender.class);
 
     protected BatchRecordSender(final HttpSender httpSender,
                                 final int batchMaxSize,
@@ -45,19 +49,58 @@ final class BatchRecordSender extends RecordSender {
 
     @Override
     public void send(final Collection<SinkRecord> records) {
-        final List<SinkRecord> batch = new ArrayList<>(batchMaxSize);
+        //final List<SinkRecord> batch = new ArrayList<>(batchMaxSize);
+        log.info("Preparing batches...");
+        List<List<SinkRecord>> batches = new ArrayList<>();
+        List<SinkRecord> currentBatch = new ArrayList<>(batchMaxSize);
+        String currentOperation = null;
+        String currentProjectId = null;
+
         for (final var record : records) {
-            batch.add(record);
-            if (batch.size() >= batchMaxSize) {
-                final String body = createRequestBody(batch);
-                batch.clear();
-                httpSender.send(body);
+            var jsonKey = new JSONObject(recordKeyConverter.convert(record));
+            var projectId = jsonKey.get("project_id").toString();
+            var turtle = jsonKey.get("turtle").toString();
+
+            var jsonValue = new JSONObject(recordValueConverter.convert(record));
+            var operation = jsonValue.get("operation").toString();
+            log.info("Operation: "+operation+" on project: "+projectId+ " with TTL: "+turtle);
+
+            if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
+                // Create a new batch if:
+                // - Operation is different from the current batch, or
+                // - Project ID is different from the current batch, or
+                // - Current batch size exceeds the maximum batch size
+
+                if (!currentBatch.isEmpty()) {
+                    // Add the current batch to the list of batches
+                    batches.add(new ArrayList<>(currentBatch));
+                    currentBatch.clear();
+                }
+
+                // Start a new batch with the current message
+                currentOperation = operation;
+                currentProjectId = projectId;
+                currentBatch.add(record);
+            } else {
+                // Add the message to the current batch
+                currentBatch.add(record);
             }
         }
 
-        if (!batch.isEmpty()) {
-            final String body = createRequestBody(batch);
-            httpSender.send(body);
+        // Add the last batch to the list of batches
+        if (!currentBatch.isEmpty()) {
+            batches.add(new ArrayList<>(currentBatch));
+        }
+
+        for (List<SinkRecord> batch : batches) {
+            var firstRecord = batch.get(0);
+            var jsonKey = new JSONObject(recordKeyConverter.convert(firstRecord));
+            var projectId = jsonKey.get("project_id").toString();
+            var jsonValue = new JSONObject(recordValueConverter.convert(firstRecord));
+            var operation = jsonValue.get("operation").toString();
+            final String body = createRequestBody(batch, operation, projectId);
+
+            httpSender.send(body, projectId);
         }
     }
 
@@ -66,22 +109,37 @@ final class BatchRecordSender extends RecordSender {
         throw new ConnectException("Don't call this method for batch sending");
     }
 
-    private String createRequestBody(final Collection<SinkRecord> batch) {
+    private String createRequestBody(final Collection<SinkRecord> batch, String operation, String projectId) {
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);
         }
+        if (operation.equals("insert")) {
+            result.append("update=INSERT DATA { ");
+        }
+        else if (operation.equals("delete")) {
+            result.append("update=DELETE DATA { ");
+        }
+
         final Iterator<SinkRecord> it = batch.iterator();
         if (it.hasNext()) {
-            result.append(recordValueConverter.convert(it.next()));
+            var jsonKey = new JSONObject(recordKeyConverter.convert(it.next()));
+            var turtle = jsonKey.get("turtle").toString().stripTrailing();
+            result.append(turtle);
             while (it.hasNext()) {
-                result.append(batchSeparator);
-                result.append(recordValueConverter.convert(it.next()));
+                jsonKey = new JSONObject(recordKeyConverter.convert(it.next()));
+                turtle = jsonKey.get("turtle").toString().stripTrailing();
+                if (!result.substring(result.length() - 1).equals(".")) {
+                    result.append(batchSeparator);
+                }
+                result.append(turtle);
             }
         }
         if (!batchSuffix.isEmpty()) {
             result.append(batchSuffix);
         }
+        result.append(" }");
+        log.info("query: "+result);
         return result.toString();
     }
 }

@@ -16,9 +16,14 @@
 
 package org.geovistory.kafka.sink.connector.rdf.sender;
 
+import org.apache.kafka.connect.errors.ConnectException;
 import org.geovistory.kafka.sink.connector.rdf.config.AuthorizationType;
 import org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfig;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.Objects;
@@ -30,10 +35,10 @@ interface HttpRequestBuilder {
 
     String HEADER_CONTENT_TYPE = "Content-Type";
 
-    HttpRequest.Builder build(final HttpSinkConfig config);
+    HttpRequest.Builder build(final HttpSinkConfig config, String projectId);
 
-    HttpRequestBuilder DEFAULT_HTTP_REQUEST_BUILDER = config -> {
-        final var httpRequest = HttpRequest.newBuilder(config.httpUri())
+    HttpRequestBuilder DEFAULT_HTTP_REQUEST_BUILDER = (config, projectId) -> {
+        final var httpRequest = HttpRequest.newBuilder(config.httpUri(projectId))
                 .timeout(Duration.ofSeconds(config.httpTimeout()));
         config.getAdditionalHeaders().forEach(httpRequest::header);
         if (config.headerContentType() != null) {
@@ -42,7 +47,7 @@ interface HttpRequestBuilder {
         return httpRequest;
     };
 
-    HttpRequestBuilder AUTH_HTTP_REQUEST_BUILDER = config -> DEFAULT_HTTP_REQUEST_BUILDER.build(config)
+    HttpRequestBuilder AUTH_HTTP_REQUEST_BUILDER = (config, projectId) -> DEFAULT_HTTP_REQUEST_BUILDER.build(config, projectId)
             .header(HEADER_AUTHORIZATION, config.headerAuthorization());
 
     interface OAuth2HttpRequestBuilder extends HttpRequestBuilder {
@@ -55,4 +60,13 @@ interface HttpRequestBuilder {
             }
         };
     }
+
+    private URI toURI(final String str) {
+        try {
+            return new URL(str).toURI();
+        } catch (final MalformedURLException | URISyntaxException e) {
+            throw new ConnectException(String.format("Could not retrieve proper URI from %s", str), e);
+        }
+    }
+
 }

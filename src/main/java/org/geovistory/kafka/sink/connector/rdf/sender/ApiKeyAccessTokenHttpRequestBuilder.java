@@ -30,7 +30,7 @@ public class ApiKeyAccessTokenHttpRequestBuilder implements HttpRequestBuilder.O
     }
 
     @Override
-    public HttpRequest.Builder build(final HttpSinkConfig config) {
+    public HttpRequest.Builder build(final HttpSinkConfig config, String projectId) {
         VALIDATE.accept(config, AuthorizationType.APIKEY);
 
         final var accessTokenRequestBuilder = HttpRequest

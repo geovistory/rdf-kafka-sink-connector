@@ -40,8 +40,8 @@ public class RecordValueConverter {
     public String convert(final SinkRecord record) {
         if (!converters.containsKey(record.value().getClass())) {
             throw new DataException(
-                    "Record value must be String, Schema Struct or HashMap," 
-                    + " but " + record.value().getClass() + " is given");
+                    "Record value must be String, Schema Struct or HashMap,"
+                            + " but " + record.value().getClass() + " is given");
         }
         return converters.get(record.value().getClass()).convert(record);
     }

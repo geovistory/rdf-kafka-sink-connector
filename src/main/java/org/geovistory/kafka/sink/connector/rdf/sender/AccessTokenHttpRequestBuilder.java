@@ -33,7 +33,7 @@ class AccessTokenHttpRequestBuilder implements HttpRequestBuilder.OAuth2HttpRequ
     }
 
     @Override
-    public HttpRequest.Builder build(final HttpSinkConfig config) {
+    public HttpRequest.Builder build(final HttpSinkConfig config, String projectId) {
         VALIDATE.accept(config, AuthorizationType.OAUTH2);
 
         final var accessTokenRequestBuilder = HttpRequest
