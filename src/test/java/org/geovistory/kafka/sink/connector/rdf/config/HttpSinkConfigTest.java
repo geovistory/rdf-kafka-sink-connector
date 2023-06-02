@@ -74,7 +74,7 @@ public class HttpSinkConfigTest {
         );
 
         final HttpSinkConfig config = new HttpSinkConfig(properties);
-        assertThat(config.httpUri(null)).isEqualTo(new URI("http://localhost:8090/test"));
+        assertThat(config.httpUri("null")).isEqualTo(new URI("http://localhost:8090/test"));
         assertThat(config.httpUri("2")).isEqualTo(new URI("http://localhost:8090/my-project-2"));
         assertThat(config)
                 .returns(AuthorizationType.NONE, from(HttpSinkConfig::authorizationType))

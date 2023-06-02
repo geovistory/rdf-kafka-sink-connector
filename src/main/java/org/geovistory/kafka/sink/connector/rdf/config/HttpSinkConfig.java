@@ -573,7 +573,7 @@ public class HttpSinkConfig extends AbstractConfig {
 
 
     public URI httpUri(String projectId) {
-        if(projectId.equals("null")) return httpCommunityUri();
+        if( projectId == null || projectId.equals("null")) return httpCommunityUri();
         return httpProjectUri(projectId);
     }
 

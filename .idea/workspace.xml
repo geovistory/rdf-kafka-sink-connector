@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="Commit for batch management" />
+    <list default="true" id="95b03c1d-a893-4692-826c-93a6c69a816c" name="Changes" comment="Commit for batch management">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/BatchRecordSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/geovistory/kafka/sink/connector/rdf/recordsender/BatchRecordSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/config/HttpSinkConfigTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSenderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/geovistory/kafka/sink/connector/rdf/sender/OAuth2HttpSenderTest.java" afterDir="false" />
+    </list>
     <list id="e5ff9c90-98e2-4bca-bfd5-55ac71d27efe" name="Changes by admin" comment="Changes by admin" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +88,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dferh/IdeaProjects/http-connector-for-apache-kafka&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/dferh/IdeaProjects/RdfKafkaSinkConnector&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
@@ -170,27 +176,6 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
-    <configuration name="RdfKafkaSinkConnector [distTar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="distTar" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
-    </configuration>
     <configuration name="RdfKafkaSinkConnector [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -212,13 +197,34 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="Tests in 'rdf-kafka-sink-connector.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.RdfKafkaSinkConnector [jar]" />
+        <item itemvalue="Gradle.Tests in 'rdf-kafka-sink-connector.test'" />
         <item itemvalue="Gradle.RdfKafkaSinkConnector [build]" />
         <item itemvalue="Gradle.HttpSinkConfigTest.correctMinimalConfig" />
         <item itemvalue="Gradle.OAuth2HttpSenderTest" />
-        <item itemvalue="Gradle.RdfKafkaSinkConnector [distTar]" />
       </list>
     </recent_temporary>
   </component>
@@ -238,6 +244,8 @@
       <workItem from="1685022337846" duration="5337000" />
       <workItem from="1685431906812" duration="5158000" />
       <workItem from="1685540464427" duration="5226000" />
+      <workItem from="1685634808116" duration="5217000" />
+      <workItem from="1685710778802" duration="6571000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit with first unit tests OK.">
       <created>1680019850613</created>
@@ -274,7 +282,21 @@
       <option name="project" value="LOCAL" />
       <updated>1685634510014</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Commit for batch management&#10;Missing: good formating of the SPARQL query">
+      <created>1685635290745</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1685635290745</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Commit for batch management">
+      <created>1685700863902</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1685700863902</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -309,6 +331,7 @@
     <MESSAGE value="Commit for V0.6 and URI config in HttpSingConfig.java" />
     <MESSAGE value="Changes by admin" />
     <MESSAGE value="Commit for V0.6.3 with multiple project endpoints management" />
+    <MESSAGE value="Commit for batch management&#10;Missing: good formating of the SPARQL query" />
     <MESSAGE value="Commit for batch management" />
     <option name="LAST_COMMIT_MESSAGE" value="Commit for batch management" />
   </component>

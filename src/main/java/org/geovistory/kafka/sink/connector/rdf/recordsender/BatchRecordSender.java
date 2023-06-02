@@ -63,7 +63,7 @@ final class BatchRecordSender extends RecordSender {
 
             var jsonValue = new JSONObject(recordValueConverter.convert(record));
             var operation = jsonValue.get("operation").toString();
-            log.info("Parsing record "+projectId);
+            log.info("Operation: "+operation+" on project: "+projectId+ " with TTL: "+turtle);
 
             if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
                 // Create a new batch if:
@@ -115,28 +115,30 @@ final class BatchRecordSender extends RecordSender {
             result.append(batchPrefix);
         }
         if (operation.equals("insert")) {
-            result.append("INSERT DATA { ");
+            result.append("update=INSERT DATA { ");
         }
         else if (operation.equals("delete")) {
-            result.append("DELETE DATA { ");
+            result.append("update=DELETE DATA { ");
         }
 
         final Iterator<SinkRecord> it = batch.iterator();
         if (it.hasNext()) {
             var jsonKey = new JSONObject(recordKeyConverter.convert(it.next()));
-            var turtle = jsonKey.get("turtle").toString();
+            var turtle = jsonKey.get("turtle").toString().stripTrailing();
             result.append(turtle);
             while (it.hasNext()) {
                 jsonKey = new JSONObject(recordKeyConverter.convert(it.next()));
-                turtle = jsonKey.get("turtle").toString();
-                result.append(batchSeparator);
+                turtle = jsonKey.get("turtle").toString().stripTrailing();
+                if (!result.substring(result.length() - 1).equals(".")) {
+                    result.append(batchSeparator);
+                }
                 result.append(turtle);
             }
         }
         if (!batchSuffix.isEmpty()) {
             result.append(batchSuffix);
         }
-        result.append("\n}");
+        result.append(" }");
         log.info("query: "+result);
         return result.toString();
     }
