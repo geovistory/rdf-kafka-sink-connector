@@ -22,6 +22,7 @@ import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.geovistory.toolbox.streams.avro.Operation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,21 +50,18 @@ final class BatchRecordSender extends RecordSender {
 
     @Override
     public void send(final Collection<SinkRecord> records) {
-        //final List<SinkRecord> batch = new ArrayList<>(batchMaxSize);
         log.info("Preparing batches...");
         List<List<SinkRecord>> batches = new ArrayList<>();
         List<SinkRecord> currentBatch = new ArrayList<>(batchMaxSize);
-        String currentOperation = null;
+        Operation currentOperation = null;
         String currentProjectId = null;
 
         for (final var record : records) {
             var jsonKey = new JSONObject(recordKeyConverter.convert(record));
             var projectId = jsonKey.get("project_id").toString();
-            var turtle = jsonKey.get("turtle").toString();
 
-            var jsonValue = new JSONObject(recordValueConverter.convert(record));
-            var operation = jsonValue.get("operation").toString();
-            log.info("Operation: " + operation + " on project: " + projectId + " with TTL: " + turtle);
+            var value = recordValueConverter.convert(record);
+            var operation = value.getOperation();
 
             if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
                 // Create a new batch if:
@@ -94,26 +92,27 @@ final class BatchRecordSender extends RecordSender {
 
         for (List<SinkRecord> batch : batches) {
             var firstRecord = batch.get(0);
-            var jsonKey = new JSONObject(recordKeyConverter.convert(firstRecord));
-            var projectId = jsonKey.get("project_id").toString();
-            var jsonValue = new JSONObject(recordValueConverter.convert(firstRecord));
-            var operation = jsonValue.get("operation").toString();
+            var key = recordKeyConverter.convert(firstRecord);
+            var projectId = Integer.toString(key.getProjectId());
+            var value = recordValueConverter.convert(firstRecord);
+            var operation = value.getOperation();
             final String body = createRequestBody(batch, operation);
-
             httpSender.send(body, projectId);
         }
     }
 
     @Override
-    public void send(final SinkRecord record) {
+    public void send(final SinkRecord record, Operation operation) {
         throw new ConnectException("Don't call this method for batch sending");
     }
 
-    private String createRequestBody(final Collection<SinkRecord> batch, String operation) {
+    private String createRequestBody(final Collection<SinkRecord> batch) {
+        //TODO change the way the body is build to have the correct SPARQL query
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);
         }
+
         if (operation.equals("insert")) {
             result.append("update=INSERT DATA { ");
         } else if (operation.equals("delete")) {
@@ -122,12 +121,12 @@ final class BatchRecordSender extends RecordSender {
 
         final Iterator<SinkRecord> it = batch.iterator();
         if (it.hasNext()) {
-            var jsonKey = new JSONObject(recordKeyConverter.convert(it.next()));
-            var turtle = jsonKey.get("turtle").toString().stripTrailing();
+            var key = recordKeyConverter.convert(it.next());
+            var turtle = key.getTurtle().stripTrailing();
             result.append(turtle);
             while (it.hasNext()) {
-                jsonKey = new JSONObject(recordKeyConverter.convert(it.next()));
-                turtle = jsonKey.get("turtle").toString().stripTrailing();
+                key = recordKeyConverter.convert(it.next());
+                turtle = key.getTurtle().stripTrailing();
                 if (!result.substring(result.length() - 1).equals(".")) {
                     result.append(batchSeparator);
                 }
@@ -138,7 +137,6 @@ final class BatchRecordSender extends RecordSender {
             result.append(batchSuffix);
         }
         result.append(" }");
-        log.info("query: " + result);
         return result.toString();
     }
 }
