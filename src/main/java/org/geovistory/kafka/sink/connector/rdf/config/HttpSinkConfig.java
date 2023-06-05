@@ -23,15 +23,19 @@ import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.connect.errors.ConnectException;
 
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class HttpSinkConfig extends AbstractConfig {
     private static final String CONNECTION_GROUP = "Connection";
@@ -585,20 +589,19 @@ public class HttpSinkConfig extends AbstractConfig {
             uri = httpUrlConfig+"/"+httpEndpoint;
         }
         else uri = httpUrlConfig+httpEndpoint;
-        return toEndpointUri(uri);
+        return toEndpointUri(uri, null);
     }
 
     private URI httpProjectUri(String projectId) {
         var uri = "";
         var httpUrlConfig = getString(HTTP_URL_CONFIG);
         var httpProjectsEndpoint = getString(HTTP_PROJECTS_ENDPOINT);
-        var httpEndpoint = getString(HTTP_ENDPOINT);
 
         if (!httpUrlConfig.substring(httpUrlConfig.length() - 1).equals("/")){
             uri = httpUrlConfig+"/"+httpProjectsEndpoint+projectId;
         }
         else uri = httpUrlConfig+httpProjectsEndpoint+projectId;
-        return toEndpointUri(uri);
+        return toEndpointUri(uri, projectId);
     }
 
     public final Long kafkaRetryBackoffMs() {
@@ -684,12 +687,89 @@ public class HttpSinkConfig extends AbstractConfig {
         }
     }
 
-    private URI toEndpointUri(final String str) {
+    private URI toEndpointUri(final String str, String projectId) {
         try {
+            if (!isExistingEndpoint(str)){
+                createFusekiDataset(HTTP_PROJECTS_ENDPOINT+"_"+projectId);
+            }
             return new URL(str).toURI();
         } catch (final MalformedURLException | URISyntaxException e) {
             throw new ConnectException(String.format("Could not retrieve proper URI from %s", str), e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public static boolean isExistingEndpoint(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("HEAD");
+            int responseCode = connection.getResponseCode();
+            return responseCode != HttpURLConnection.HTTP_NOT_FOUND;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void createFusekiDataset(String datasetName) throws IOException {
+        System.out.println("createFusekiDataset  " + datasetName + "...");
+
+        String template = prepareTemplate(datasetName);
+        String mimetype = "text/plain";
+        byte[] blob = template.getBytes(StandardCharsets.UTF_8);
+        String url = HTTP_URL_CONFIG + "/$/datasets";
+        String base64 = Base64.getEncoder().encodeToString(HTTP_HEADERS_AUTHORIZATION_CONFIG.getBytes(StandardCharsets.UTF_8));
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "text/turtle");
+        connection.setRequestProperty("Authorization", "Basic " + base64);
+
+        try (OutputStream outputStream = connection.getOutputStream()) {
+            outputStream.write(blob);
+        }
+
+        int responseCode = connection.getResponseCode();
+        String responseStatusText = connection.getResponseMessage();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            System.out.println(responseStatusText);
+        } else if (responseStatusText.equals("Conflict")) {
+            System.out.println("Dataset already exists");
+        } else {
+            throw new IOException(responseStatusText);
+        }
+    }
+
+    private static String prepareTemplate(String datasetName) throws IOException {
+        File templateFile = new File("../resources/datasetTemplate.ttl");
+        BufferedReader reader = new BufferedReader(new FileReader(templateFile));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            line = line.replace("my_dataset", datasetName);
+            stringBuilder.append(line).append("\n");
+        }
+
+        reader.close();
+
+        String result = stringBuilder.toString();
+        String templateFilePath = "./tmp/template-" + datasetName;
+        File outputFile = new File(templateFilePath);
+        outputFile.getParentFile().mkdirs();
+        outputFile.createNewFile();
+        outputFile.setWritable(true);
+
+        // Write the modified template to the output file
+        FileWriter writer = new FileWriter(outputFile);
+        writer.write(result);
+        writer.close();
+
+        return templateFilePath;
     }
 
     public final String oauth2ClientId() {
