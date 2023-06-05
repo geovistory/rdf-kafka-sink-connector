@@ -689,8 +689,10 @@ public class HttpSinkConfig extends AbstractConfig {
 
     private URI toEndpointUri(final String str, String projectId) {
         try {
-            if (!isExistingEndpoint(str)){
-                createFusekiDataset(HTTP_PROJECTS_ENDPOINT+"_"+projectId);
+            if ( !(projectId == null || projectId.equals("null"))){
+                if (!isExistingEndpoint(str)){
+                    createFusekiDataset(getString(HTTP_PROJECTS_ENDPOINT)+"_"+projectId);
+                }
             }
             return new URL(str).toURI();
         } catch (final MalformedURLException | URISyntaxException e) {
@@ -713,20 +715,24 @@ public class HttpSinkConfig extends AbstractConfig {
         }
     }
 
-    public static void createFusekiDataset(String datasetName) throws IOException {
+    private void createFusekiDataset(String datasetName) throws IOException {
         System.out.println("createFusekiDataset  " + datasetName + "...");
 
         String template = prepareTemplate(datasetName);
         String mimetype = "text/plain";
         byte[] blob = template.getBytes(StandardCharsets.UTF_8);
-        String url = HTTP_URL_CONFIG + "/$/datasets";
-        String base64 = Base64.getEncoder().encodeToString(HTTP_HEADERS_AUTHORIZATION_CONFIG.getBytes(StandardCharsets.UTF_8));
+        String url = getString(HTTP_URL_CONFIG) + "/$/datasets";
+        String base64 = "";
 
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "text/turtle");
-        connection.setRequestProperty("Authorization", "Basic " + base64);
+
+        if (getString(HTTP_AUTHORIZATION_TYPE_CONFIG).equals("static")) {
+            base64 = Base64.getEncoder().encodeToString(getString(HTTP_HEADERS_AUTHORIZATION_CONFIG).getBytes(StandardCharsets.UTF_8));
+            connection.setRequestProperty("Authorization", "Basic " + base64);
+        }
 
         try (OutputStream outputStream = connection.getOutputStream()) {
             outputStream.write(blob);
@@ -745,7 +751,7 @@ public class HttpSinkConfig extends AbstractConfig {
     }
 
     private static String prepareTemplate(String datasetName) throws IOException {
-        File templateFile = new File("../resources/datasetTemplate.ttl");
+        File templateFile = new File("src/main/resources/datasetTemplate.ttl");
         BufferedReader reader = new BufferedReader(new FileReader(templateFile));
         StringBuilder stringBuilder = new StringBuilder();
         String line;

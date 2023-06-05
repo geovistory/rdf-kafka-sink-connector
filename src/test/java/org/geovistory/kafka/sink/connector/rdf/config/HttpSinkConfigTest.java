@@ -67,15 +67,15 @@ public class HttpSinkConfigTest {
     @Test
     void correctMinimalConfig() throws URISyntaxException {
         final Map<String, String> properties = Map.of(
-                "http.url", "http://localhost:8090",
+                "http.url", "http://localhost:3030",
                 "http.endpoint", "test",
                 "http.projects.endpoint", "my-project-",
                 "http.authorization.type", "none"
         );
 
         final HttpSinkConfig config = new HttpSinkConfig(properties);
-        assertThat(config.httpUri("null")).isEqualTo(new URI("http://localhost:8090/test"));
-        assertThat(config.httpUri("2")).isEqualTo(new URI("http://localhost:8090/my-project-2"));
+        assertThat(config.httpUri("null")).isEqualTo(new URI("http://localhost:3030/test"));
+        assertThat(config.httpUri("2")).isEqualTo(new URI("http://localhost:3030/my-project-2"));
         assertThat(config)
                 .returns(AuthorizationType.NONE, from(HttpSinkConfig::authorizationType))
                 .returns(null, from(HttpSinkConfig::headerContentType))
