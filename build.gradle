@@ -24,7 +24,7 @@ plugins {
 
 group 'org.geovistory'
 
-version = "0.7.0"
+version = "0.7.1"
 apply plugin: "com.dipien.semantic-version"
 
 
@@ -55,7 +55,6 @@ dependencies {
 
     // logging
     implementation 'org.slf4j:slf4j-simple:2.0.5'
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
 
     //testing
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'

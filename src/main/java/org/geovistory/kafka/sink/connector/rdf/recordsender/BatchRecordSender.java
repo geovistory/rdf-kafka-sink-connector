@@ -63,7 +63,7 @@ final class BatchRecordSender extends RecordSender {
 
             var jsonValue = new JSONObject(recordValueConverter.convert(record));
             var operation = jsonValue.get("operation").toString();
-            log.info("Operation: "+operation+" on project: "+projectId+ " with TTL: "+turtle);
+            log.info("Operation: " + operation + " on project: " + projectId + " with TTL: " + turtle);
 
             if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
                 // Create a new batch if:
@@ -98,7 +98,7 @@ final class BatchRecordSender extends RecordSender {
             var projectId = jsonKey.get("project_id").toString();
             var jsonValue = new JSONObject(recordValueConverter.convert(firstRecord));
             var operation = jsonValue.get("operation").toString();
-            final String body = createRequestBody(batch, operation, projectId);
+            final String body = createRequestBody(batch, operation);
 
             httpSender.send(body, projectId);
         }
@@ -109,15 +109,14 @@ final class BatchRecordSender extends RecordSender {
         throw new ConnectException("Don't call this method for batch sending");
     }
 
-    private String createRequestBody(final Collection<SinkRecord> batch, String operation, String projectId) {
+    private String createRequestBody(final Collection<SinkRecord> batch, String operation) {
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);
         }
         if (operation.equals("insert")) {
             result.append("update=INSERT DATA { ");
-        }
-        else if (operation.equals("delete")) {
+        } else if (operation.equals("delete")) {
             result.append("update=DELETE DATA { ");
         }
 
@@ -139,7 +138,7 @@ final class BatchRecordSender extends RecordSender {
             result.append(batchSuffix);
         }
         result.append(" }");
-        log.info("query: "+result);
+        log.info("query: " + result);
         return result.toString();
     }
 }

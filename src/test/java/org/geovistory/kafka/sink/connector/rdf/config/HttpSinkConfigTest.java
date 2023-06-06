@@ -55,8 +55,9 @@ public class HttpSinkConfigTest {
                         ))
         );
     }
+
     @Test
-    void testRequiredConfigurations(){
+    void testRequiredConfigurations() {
         final Map<String, String> properties = Map.of();
         assertThatExceptionOfType(ConfigException.class)
                 .describedAs("Expected config exception due to missing http.url")

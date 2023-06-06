@@ -56,18 +56,17 @@ final class SingleRecordSender extends RecordSender {
         var jsonValue = new JSONObject(recordValueConverter.convert(record));
         var operation = jsonValue.get("operation").toString();
 
-        log.info("operation: "+operation);
-        log.info("projectId: "+projectId);
-        log.info("turtle: "+turtle);
+        log.info("operation: " + operation);
+        log.info("projectId: " + projectId);
+        log.info("turtle: " + turtle);
 
         if (operation.equals("insert")) {
-            sparqlQuery = "INSERT DATA { "+turtle+ "}";
+            sparqlQuery = "INSERT DATA { " + turtle + "}";
+        } else if (operation.equals("delete")) {
+            sparqlQuery = "DELETE DATA { " + turtle + "}";
         }
-        else if (operation.equals("delete")) {
-            sparqlQuery = "DELETE DATA { "+turtle+ "}";
-        }
-        var body = paramName+"="+sparqlQuery;
-        log.info(paramName+"="+sparqlQuery);
+        var body = paramName + "=" + sparqlQuery;
+        log.info(paramName + "=" + sparqlQuery);
 
         httpSender.send(body, projectId);
     }

@@ -23,19 +23,15 @@ import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.config.types.Password;
 import org.apache.kafka.connect.errors.ConnectException;
 
-import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 public class HttpSinkConfig extends AbstractConfig {
     private static final String CONNECTION_GROUP = "Connection";
@@ -138,7 +134,7 @@ public class HttpSinkConfig extends AbstractConfig {
                     @SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE") // Suppress the ConfigException with null value.
                     public void ensureValid(final String name, final Object value) {
                         if (value == null) {
-                            throw new ConfigException(HTTP_AUTHORIZATION_TYPE_CONFIG, value);
+                            throw new ConfigException(HTTP_AUTHORIZATION_TYPE_CONFIG, null);
                         }
                         assert value instanceof String;
                         final String valueStr = (String) value;
