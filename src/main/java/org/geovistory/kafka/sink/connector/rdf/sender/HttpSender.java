@@ -18,6 +18,7 @@ package org.geovistory.kafka.sink.connector.rdf.sender;
 
 import org.apache.kafka.connect.errors.ConnectException;
 import org.geovistory.kafka.sink.connector.rdf.config.HttpSinkConfig;
+import org.geovistory.kafka.sink.connector.rdf.fuseki.DatasetHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,8 @@ public class HttpSender {
                 httpRequestBuilder
                         .build(config, projectId)
                         .POST(HttpRequest.BodyPublishers.ofString(body));
-        sendWithRetries(requestBuilder, HttpResponseHandler.ON_HTTP_ERROR_RESPONSE_HANDLER);
+
+        sendWithRetries(requestBuilder, HttpResponseHandler.ON_HTTP_ERROR_RESPONSE_HANDLER, projectId);
     }
 
     /**
@@ -74,7 +76,9 @@ public class HttpSender {
      * @return whether the sending was successful.
      */
     protected HttpResponse<String> sendWithRetries(final HttpRequest.Builder requestBuilder,
-                                                   final HttpResponseHandler httpResponseHandler) {
+                                                   final HttpResponseHandler httpResponseHandler,
+                                                   final String projectId) {
+        //TODO check if dataset exists here
         int remainRetries = config.maxRetries();
         while (remainRetries >= 0) {
             try {
@@ -82,7 +86,11 @@ public class HttpSender {
                     final var response =
                             httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
                     log.debug("Server replied with status code {} and body {}", response.statusCode(), response.body());
-                    httpResponseHandler.onResponse(response);
+                    var code = httpResponseHandler.onResponse(response);
+                    if (code == ResponseSenderCode.DATASET_NOT_EXISTING) {
+                        DatasetHandler.createFusekiDataset(config.getDatasetName(projectId), config.getHttpUrlConfig(), config.getHttpHeadersAuthorizationConfig());
+                        remainRetries++;
+                    }
                     return response;
                 } catch (final IOException e) {
                     log.info("Sending failed, will retry in {} ms ({} retries remain)",

@@ -53,17 +53,19 @@ final class OAuth2HttpSender extends HttpSender {
 
     @Override
     protected HttpResponse<String> sendWithRetries(final HttpRequest.Builder requestBuilder,
-                                                   final HttpResponseHandler originHttpResponseHandler) {
+                                                   final HttpResponseHandler originHttpResponseHandler,
+                                                   final String projectId) {
         final var accessTokenAwareRequestBuilder = loadOrRefreshAccessToken(requestBuilder);
         final HttpResponseHandler handler = response -> {
             if (response.statusCode() == 401) { // access denied or refresh of a token is needed
                 this.accessTokenAuthHeader = null;
-                this.sendWithRetries(requestBuilder, originHttpResponseHandler);
+                this.sendWithRetries(requestBuilder, originHttpResponseHandler, projectId);
             } else {
                 originHttpResponseHandler.onResponse(response);
             }
+            return null;
         };
-        return super.sendWithRetries(accessTokenAwareRequestBuilder, handler);
+        return super.sendWithRetries(accessTokenAwareRequestBuilder, handler, null);
     }
 
     private HttpRequest.Builder loadOrRefreshAccessToken(final HttpRequest.Builder requestBuilder) {
@@ -74,7 +76,8 @@ final class OAuth2HttpSender extends HttpSender {
                 final var response =
                         super.sendWithRetries(
                                 oauth2HttpRequestBuilder.build(config, null),
-                                HttpResponseHandler.ON_HTTP_ERROR_RESPONSE_HANDLER
+                                HttpResponseHandler.ON_HTTP_ERROR_RESPONSE_HANDLER,
+                                null
                         );
                 accessTokenAuthHeader = buildAccessTokenAuthHeader(response.body());
             } catch (final IOException e) {
@@ -86,7 +89,8 @@ final class OAuth2HttpSender extends HttpSender {
 
     private String buildAccessTokenAuthHeader(final String responseBody) throws JsonProcessingException {
         final var accessTokenResponse =
-                objectMapper.readValue(responseBody, new TypeReference<Map<String, String>>() {});
+                objectMapper.readValue(responseBody, new TypeReference<Map<String, String>>() {
+                });
         if (!accessTokenResponse.containsKey(config.oauth2ResponseTokenProperty())) {
             throw new ConnectException(
                     "Couldn't find access token property "
