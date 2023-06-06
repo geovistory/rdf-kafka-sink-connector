@@ -102,20 +102,19 @@ final class BatchRecordSender extends RecordSender {
     }
 
     @Override
-    public void send(final SinkRecord record, Operation operation) {
+    public void send(final SinkRecord record) {
         throw new ConnectException("Don't call this method for batch sending");
     }
 
-    private String createRequestBody(final Collection<SinkRecord> batch) {
-        //TODO change the way the body is build to have the correct SPARQL query
+    private String createRequestBody(final Collection<SinkRecord> batch, Operation operation) {
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);
         }
 
-        if (operation.equals("insert")) {
+        if (operation.equals(Operation.insert)) {
             result.append("update=INSERT DATA { ");
-        } else if (operation.equals("delete")) {
+        } else if (operation.equals(Operation.delete)) {
             result.append("update=DELETE DATA { ");
         }
 
