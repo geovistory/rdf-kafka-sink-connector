@@ -18,8 +18,7 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
-
-import org.json.JSONObject;
+import org.geovistory.toolbox.streams.avro.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,7 @@ import java.util.Collection;
 
 final class SingleRecordSender extends RecordSender {
 
-    protected SingleRecordSender(final HttpSender httpSender) {
+    SingleRecordSender(final HttpSender httpSender) {
         super(httpSender);
     }
 
@@ -42,27 +41,32 @@ final class SingleRecordSender extends RecordSender {
 
     @Override
     public void send(final SinkRecord record) {
-        log.info(recordKeyConverter.convert(record));
+        log.info(recordKeyConverter.convert(record).toString());
         prepareAndSendBody(record);
     }
 
     private void prepareAndSendBody(SinkRecord record) {
         var paramName = "update";
         var sparqlQuery = "";
-        var jsonKey = new JSONObject(recordKeyConverter.convert(record));
-        var projectId = jsonKey.get("project_id").toString();
-        var turtle = jsonKey.get("turtle").toString();
+        var key = recordKeyConverter.convert(record);
 
-        var jsonValue = new JSONObject(recordValueConverter.convert(record));
-        var operation = jsonValue.get("operation").toString();
+        // TODO handle key==null (log a warning and return)
+
+        var projectId = Integer.toString(key.getProjectId());
+        var turtle = key.getTurtle();
+
+        var value = recordValueConverter.convert(record);
+        // TODO handle value==null (log a warning and return)
+
+        var operation = value.getOperation();
 
         log.info("operation: " + operation);
         log.info("projectId: " + projectId);
         log.info("turtle: " + turtle);
 
-        if (operation.equals("insert")) {
+        if (operation.equals(Operation.insert)) {
             sparqlQuery = "INSERT DATA { " + turtle + "}";
-        } else if (operation.equals("delete")) {
+        } else if (operation.equals(Operation.delete)) {
             sparqlQuery = "DELETE DATA { " + turtle + "}";
         }
         var body = paramName + "=" + sparqlQuery;

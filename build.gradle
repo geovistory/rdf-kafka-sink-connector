@@ -20,6 +20,9 @@ plugins {
 
     // https://docs.gradle.org/current/userguide/idea_plugin.html
     id 'idea'
+
+    // Used to build java class source code from avro schemas
+    id "com.github.davidmc24.gradle.plugin.avro" version "1.5.0"
 }
 
 group 'org.geovistory'
@@ -30,6 +33,9 @@ apply plugin: "com.dipien.semantic-version"
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
 }
 
 distributions {
@@ -49,6 +55,13 @@ dependencies {
     implementation 'org.apache.jena:jena-core:4.7.0'
     implementation 'org.apache.jena:jena-shaded-guava:4.7.0'
     implementation 'org.eclipse.jetty:jetty-client:11.0.14'
+
+    // For gradle-avro-plugin
+    implementation "org.apache.avro:avro:1.11.0"
+
+    // To convert avro records from kafka to java data
+    implementation 'io.confluent:kafka-connect-avro-data:7.0.1'
+
 
     // https://mvnrepository.com/artifact/org.json/json
     implementation 'org.json:json:20230227'

@@ -16,34 +16,18 @@
 
 package org.geovistory.kafka.sink.connector.rdf.converter;
 
-import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.sink.SinkRecord;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.geovistory.toolbox.streams.avro.ProjectRdfKey;
 
 public class RecordKeyConverter {
-
-    private final JsonRecordKeyConverter jsonRecordKeyConverter = new JsonRecordKeyConverter();
-
-    private final Map<Class<?>, Converter> converters = Map.of(
-            String.class, record -> (String) record.key(),
-            HashMap.class, jsonRecordKeyConverter,
-            Struct.class, jsonRecordKeyConverter
-    );
+    private final AvroRecordKeyConverter avroRecordKeyConverter = new AvroRecordKeyConverter();
 
     interface Converter {
-        String convert(final SinkRecord record);
+        ProjectRdfKey convert(final SinkRecord record);
     }
 
-    public String convert(final SinkRecord record) {
-        if (!converters.containsKey(record.key().getClass())) {
-            throw new DataException(
-                    "Record key must be String, Schema Struct or HashMap,"
-                    + " but " + record.key().getClass() + " is given");
-        }
-        return converters.get(record.key().getClass()).convert(record);
+    public ProjectRdfKey convert(final SinkRecord record) {
+        return avroRecordKeyConverter.convert(record);
     }
 
 }
