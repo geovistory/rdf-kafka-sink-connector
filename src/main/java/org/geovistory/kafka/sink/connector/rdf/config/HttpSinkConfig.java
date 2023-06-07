@@ -134,7 +134,7 @@ public class HttpSinkConfig extends AbstractConfig {
                     @SuppressFBWarnings("NP_LOAD_OF_KNOWN_NULL_VALUE") // Suppress the ConfigException with null value.
                     public void ensureValid(final String name, final Object value) {
                         if (value == null) {
-                            throw new ConfigException(HTTP_AUTHORIZATION_TYPE_CONFIG, value);
+                            throw new ConfigException(HTTP_AUTHORIZATION_TYPE_CONFIG, null);
                         }
                         assert value instanceof String;
                         final String valueStr = (String) value;
@@ -571,32 +571,30 @@ public class HttpSinkConfig extends AbstractConfig {
 
     }
 
-
     public URI httpUri(String projectId) {
-        if (projectId == null || projectId.equals("null")) return httpCommunityUri();
-        return httpProjectUri(projectId);
-    }
-
-    private URI httpCommunityUri() {
-        var uri = "";
+        String dataset = getDatasetName(projectId);
         var httpUrlConfig = getString(HTTP_URL_CONFIG);
-        var httpEndpoint = getString(HTTP_ENDPOINT);
+        var uri = "";
         if (!httpUrlConfig.substring(httpUrlConfig.length() - 1).equals("/")) {
-            uri = httpUrlConfig + "/" + httpEndpoint;
-        } else uri = httpUrlConfig + httpEndpoint;
+            uri = httpUrlConfig + "/" + dataset;
+        } else uri = httpUrlConfig + dataset;
         return toEndpointUri(uri);
     }
 
-    private URI httpProjectUri(String projectId) {
-        var uri = "";
-        var httpUrlConfig = getString(HTTP_URL_CONFIG);
-        var httpProjectsEndpoint = getString(HTTP_PROJECTS_ENDPOINT);
-        var httpEndpoint = getString(HTTP_ENDPOINT);
+    public String getDatasetName(String projectId) {
+        if (projectId == null || projectId.equals("null") || projectId.equals("0")) {
+            return getString(HTTP_ENDPOINT);
+        } else {
+            return getString(HTTP_PROJECTS_ENDPOINT) + projectId;
+        }
+    }
 
-        if (!httpUrlConfig.substring(httpUrlConfig.length() - 1).equals("/")) {
-            uri = httpUrlConfig + "/" + httpProjectsEndpoint + projectId;
-        } else uri = httpUrlConfig + httpProjectsEndpoint + projectId;
-        return toEndpointUri(uri);
+    public String getHttpUrlConfig() {
+        return getString(HTTP_URL_CONFIG);
+    }
+
+    public String getHttpHeadersAuthorizationConfig() {
+        return getString(HTTP_HEADERS_AUTHORIZATION_CONFIG);
     }
 
     public final Long kafkaRetryBackoffMs() {

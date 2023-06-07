@@ -19,6 +19,9 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.geovistory.toolbox.streams.avro.Operation;
 
 import java.util.ArrayList;
@@ -31,12 +34,13 @@ final class BatchRecordSender extends RecordSender {
     private final String batchPrefix;
     private final String batchSuffix;
     private final String batchSeparator;
+    private static final Logger log = LoggerFactory.getLogger(BatchRecordSender.class);
 
-    BatchRecordSender(final HttpSender httpSender,
-                      final int batchMaxSize,
-                      final String batchPrefix,
-                      final String batchSuffix,
-                      final String batchSeparator) {
+    protected BatchRecordSender(final HttpSender httpSender,
+                                final int batchMaxSize,
+                                final String batchPrefix,
+                                final String batchSuffix,
+                                final String batchSeparator) {
         super(httpSender);
         this.batchMaxSize = batchMaxSize;
         this.batchPrefix = batchPrefix;
@@ -46,15 +50,15 @@ final class BatchRecordSender extends RecordSender {
 
     @Override
     public void send(final Collection<SinkRecord> records) {
+        log.info("Preparing batches...");
         List<List<SinkRecord>> batches = new ArrayList<>();
         List<SinkRecord> currentBatch = new ArrayList<>(batchMaxSize);
         Operation currentOperation = null;
         String currentProjectId = null;
 
         for (final var record : records) {
-            var key = recordKeyConverter.convert(record);
-            var projectId = Integer.toString(key.getProjectId());
-            var turtle = key.getTurtle(); // TODO handle turtle
+            var jsonKey = new JSONObject(recordKeyConverter.convert(record));
+            var projectId = jsonKey.get("project_id").toString();
 
             var value = recordValueConverter.convert(record);
             var operation = value.getOperation();
@@ -87,10 +91,12 @@ final class BatchRecordSender extends RecordSender {
         }
 
         for (List<SinkRecord> batch : batches) {
-            final String body = createRequestBody(batch);
             var firstRecord = batch.get(0);
             var key = recordKeyConverter.convert(firstRecord);
             var projectId = Integer.toString(key.getProjectId());
+            var value = recordValueConverter.convert(firstRecord);
+            var operation = value.getOperation();
+            final String body = createRequestBody(batch, operation);
             httpSender.send(body, projectId);
         }
     }
@@ -100,23 +106,36 @@ final class BatchRecordSender extends RecordSender {
         throw new ConnectException("Don't call this method for batch sending");
     }
 
-    private String createRequestBody(final Collection<SinkRecord> batch) {
-        //TODO change the way the body is build to have the correct SPARQL query
+    private String createRequestBody(final Collection<SinkRecord> batch, Operation operation) {
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);
         }
+
+        if (operation.equals(Operation.insert)) {
+            result.append("update=INSERT DATA { ");
+        } else if (operation.equals(Operation.delete)) {
+            result.append("update=DELETE DATA { ");
+        }
+
         final Iterator<SinkRecord> it = batch.iterator();
         if (it.hasNext()) {
-            result.append(recordValueConverter.convert(it.next()));
+            var key = recordKeyConverter.convert(it.next());
+            var turtle = key.getTurtle().stripTrailing();
+            result.append(turtle);
             while (it.hasNext()) {
-                result.append(batchSeparator);
-                result.append(recordValueConverter.convert(it.next()));
+                key = recordKeyConverter.convert(it.next());
+                turtle = key.getTurtle().stripTrailing();
+                if (!result.substring(result.length() - 1).equals(".")) {
+                    result.append(batchSeparator);
+                }
+                result.append(turtle);
             }
         }
         if (!batchSuffix.isEmpty()) {
             result.append(batchSuffix);
         }
+        result.append(" }");
         return result.toString();
     }
 }
