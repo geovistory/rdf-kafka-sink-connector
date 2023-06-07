@@ -39,7 +39,13 @@ class AvroRecordValueConverter implements RecordValueConverter.Converter {
     public ProjectRdfValue convert(final SinkRecord record) {
         try {
             var gerneric = (GenericData.Record) avroData.fromConnectData(projectRdfValueSchema, record.value());
-            Operation o = (Operation) gerneric.get("operation");
+            var operationStr = gerneric.get("operation").toString();
+            Operation o = null;
+            if (operationStr.equals("insert")) {
+                o = Operation.insert;
+            } else if (operationStr.equals("delete")) {
+                o = Operation.delete;
+            }
             if (o == null) {
                 throw new Exception("record.value.operation is null");
             }
