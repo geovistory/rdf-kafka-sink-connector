@@ -41,6 +41,8 @@ jobs:
           arguments: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GEOVBOT_PAT }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USER }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
 
       - name: Send Discord Notification
         uses: sarisia/actions-status-discord@v1
