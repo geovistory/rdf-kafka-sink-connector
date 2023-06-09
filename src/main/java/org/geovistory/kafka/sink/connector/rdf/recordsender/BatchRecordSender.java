@@ -54,11 +54,11 @@ final class BatchRecordSender extends RecordSender {
         List<List<SinkRecord>> batches = new ArrayList<>();
         List<SinkRecord> currentBatch = new ArrayList<>(batchMaxSize);
         Operation currentOperation = null;
-        String currentProjectId = null;
+        Integer currentProjectId = null;
 
         for (final var record : records) {
-            var jsonKey = new JSONObject(recordKeyConverter.convert(record));
-            var projectId = jsonKey.get("project_id").toString();
+            var key = recordKeyConverter.convert(record);
+            Integer projectId = key.getProjectId();
 
             var value = recordValueConverter.convert(record);
             var operation = value.getOperation();
