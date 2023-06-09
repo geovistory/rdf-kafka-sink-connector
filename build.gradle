@@ -106,11 +106,11 @@ tasks.named('test') {
 publishing {
     repositories {
         maven {
-            name = "OSSRH"
+            name = "org.geovistory"
             url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+                username = project.findProperty("gpr.maven.user") ?: System.getenv("MAVEN_USERNAME")
+                password = project.findProperty("gpr.maven.password") ?: System.getenv("MAVEN_PASSWORD")
             }
         }
         maven {
@@ -124,6 +124,8 @@ publishing {
     }
     publications {
         maven(MavenPublication) {
+            groupId = 'org.geovistory'
+            artifactId = 'rdf-kafka-sink-connector'
             from components.java
         }
     }
