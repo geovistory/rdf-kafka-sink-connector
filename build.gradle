@@ -75,7 +75,6 @@ dependencies {
     implementation 'org.apache.jena:jena-arq:4.7.0'
     implementation 'org.apache.jena:jena-core:4.7.0'
     implementation 'org.apache.jena:jena-shaded-guava:4.7.0'
-    implementation 'org.eclipse.jetty:jetty-client:11.0.14'
 
     // For gradle-avro-plugin
     implementation "org.apache.avro:avro:1.11.0"
@@ -124,6 +123,10 @@ dependencies {
     integrationTestImplementation "javax.servlet:javax.servlet-api:4.0.1"
     integrationTestImplementation "org.apache.avro:avro:1.11.1"
     integrationTestImplementation "org.apache.kafka:connect-runtime:3.4.0"
+    integrationTestImplementation "org.eclipse.jetty:jetty-http:9.4.39.v20210325"
+    integrationTestImplementation "org.eclipse.jetty:jetty-server:9.4.39.v20210325"
+    integrationTestImplementation "org.eclipse.jetty:jetty-util:9.4.39.v20210325"
+    integrationTestImplementation 'org.eclipse.jetty:jetty-client:9.4.39.v20210325'
     integrationTestImplementation "junit:junit:4.13.2" // This is for testcontainers
     integrationTestImplementation "org.testcontainers:junit-jupiter:1.18.3"
     integrationTestImplementation "org.testcontainers:kafka:1.18.3" // this is not Kafka version
@@ -151,7 +154,8 @@ task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
 
-    dependsOn test, distTar
+    // dependsOn test, distTar
+    dependsOn distTar
 
     useJUnitPlatform()
 
