@@ -1,8 +1,11 @@
 package org.geovistory.kafka.sink.connector.rdf.fuseki;
 
+import org.apache.jena.atlas.logging.Log;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownServiceException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,8 +34,12 @@ public class DatasetHandler {
         connection.setRequestProperty("Content-Type", "text/turtle");
         connection.setRequestProperty("Authorization", "Basic " + base64);
 
-        try (OutputStream outputStream = connection.getOutputStream()) {
+        try {
+            OutputStream outputStream = connection.getOutputStream();
             outputStream.write(blob);
+        }
+        catch (IOException e){
+            Log.error(e, e.getMessage());
         }
 
         int responseCode = connection.getResponseCode();

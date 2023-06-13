@@ -61,9 +61,10 @@ import static org.awaitility.Awaitility.await;
 @Testcontainers
 public class AvroIntegrationTest {
 
-    private static final String HTTP_PATH = "/send-data-here";
-    private static final String AUTHORIZATION = "Bearer some-token";
-    private static final String CONTENT_TYPE = "application/json";
+    private static final String HTTP_PATH = "/api_v1_community_data";
+    private static final String HTTP_AUTHORIZATION_TYPE_CONFIG = "static";
+    private static final String AUTHORIZATION = "admin:pw";
+    private static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
 
     private static final String CONNECTOR_NAME = "test-source-connector";
 
@@ -186,7 +187,7 @@ public class AvroIntegrationTest {
         final List<Future<RecordMetadata>> sendFutures = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             for (int partition = 0; partition < TEST_TOPIC_PARTITIONS; partition++) {
-                final String ttl = "<foo" + i + ">";
+                final String ttl = "<foo" + i + "> <has> <bar>";
                 final int projectId = i / 100;
                 final var operation = Operation.insert;
                 final var record = createRecord(ttl, projectId, operation);
@@ -212,7 +213,9 @@ public class AvroIntegrationTest {
         config.put("value.converter.schema.registry.url", schemaRegistryUrl);
         config.put("tasks.max", "1");
         config.put("http.url", "http://" + fuseki.getHost() + ":" + fuseki.getFirstMappedPort() + HTTP_PATH);
-        config.put("http.authorization.type", "static");
+        config.put("http.endpoint", "api_v1_community_data");
+        config.put("http.projects.endpoint", "api_v1_project_");
+        config.put("http.authorization.type", HTTP_AUTHORIZATION_TYPE_CONFIG);
         config.put("http.headers.authorization", AUTHORIZATION);
         config.put("http.headers.content.type", CONTENT_TYPE);
         return config;
