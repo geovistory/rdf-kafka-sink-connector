@@ -67,7 +67,7 @@ public class AvroIntegrationTest {
 
     private static final String CONNECTOR_NAME = "test-source-connector";
 
-    private static final String TEST_TOPIC = "dev-rdf-test-topic";
+    private static final String TEST_TOPIC = "project-rdf";
     private static final int TEST_TOPIC_PARTITIONS = 4;
 
     static final String JSON_PATTERN = "{\"name\":\"%s\",\"value\":\"%s\"}";
@@ -92,7 +92,7 @@ public class AvroIntegrationTest {
             .withNetwork(Network.newNetwork())
             .withEnv("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "false");
 
-    private Admin admin;
+    public Admin admin;
     private KafkaProducer<String, GenericRecord> producer;
 
     private ConnectRunner connectRunner;
@@ -140,7 +140,8 @@ public class AvroIntegrationTest {
         );
         producer = new KafkaProducer<>(producerProps);
 
-        try (Admin admin = Admin.create(adminClientConfig)) {
+        try {
+            admin = Admin.create(adminClientConfig);
             String topicName = TEST_TOPIC;
             int partitions = TEST_TOPIC_PARTITIONS;
             short replicationFactor = 1;
@@ -154,6 +155,10 @@ public class AvroIntegrationTest {
             // Call get() to block until the topic creation is complete or has failed
             // if creation failed the ExecutionException wraps the underlying cause.
             future.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
 
         connectRunner = new ConnectRunner(pluginsDir, kafka.getBootstrapServers());
@@ -219,7 +224,7 @@ public class AvroIntegrationTest {
         ProjectRdfKey key = ProjectRdfKey.newBuilder().setProjectId(projectId).setTurtle(ttl).build();
         ProjectRdfValue value = ProjectRdfValue.newBuilder().setOperation(operation).build();
 
-        return new ProducerRecord<ProjectRdfKey, ProjectRdfValue>("dev-rdf-test-topic", key, value);
+        return new ProducerRecord<ProjectRdfKey, ProjectRdfValue>("project-rdf", key, value);
     }
 
     private Future<RecordMetadata> sendMessageAsync(final ProducerRecord record) {
