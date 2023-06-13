@@ -80,7 +80,6 @@ dependencies {
     implementation "org.apache.avro:avro:1.11.0"
 
     // To convert avro records from kafka to java data
-    implementation 'io.confluent:kafka-connect-avro-data:7.0.1'
     implementation 'io.confluent:kafka-connect-avro-converter:7.0.1'
 
 
@@ -105,9 +104,13 @@ dependencies {
     // Use underscore for testing.
     testImplementation 'com.github.javadev:underscore:1.87'
 
+    // to test converters
+    testImplementation 'io.confluent:kafka-connect-avro-data:7.0.1'
+
     // To test integration with Fuseki
     testImplementation "org.testcontainers:testcontainers:1.18.3"
     testImplementation "org.testcontainers:junit-jupiter:1.18.3"
+
 
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"
     compileOnly "com.google.code.findbugs:annotations:3.0.1"

@@ -16,10 +16,7 @@
 
 package org.geovistory.kafka.sink.connector.rdf.converter;
 
-import io.confluent.connect.avro.AvroData;
-import io.confluent.connect.avro.AvroDataConfig;
-import org.apache.avro.generic.GenericData;
-import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.toolbox.streams.avro.ProjectRdfKey;
 import org.slf4j.Logger;
@@ -27,19 +24,13 @@ import org.slf4j.LoggerFactory;
 
 class AvroRecordKeyConverter implements RecordKeyConverter.Converter {
     private static final Logger log = LoggerFactory.getLogger(AvroRecordKeyConverter.class);
-    private final AvroData avroData = new AvroData(new AvroDataConfig.Builder()
-            .with(AvroDataConfig.SCHEMAS_CACHE_SIZE_CONFIG, 1000)
-            .with(AvroDataConfig.ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG, true)
-            .build());
-
-    private final Schema projectRdfKeySchema = avroData.toConnectSchema(ProjectRdfKey.SCHEMA$);
 
     @Override
     public ProjectRdfKey convert(final SinkRecord record) {
         try {
-            var gerneric = (GenericData.Record) avroData.fromConnectData(projectRdfKeySchema, record.key());
-            Integer p = (Integer) gerneric.get("project_id");
-            String t = (String) gerneric.get("turtle");
+            var generic = (Struct) record.key();
+            Integer p = (Integer) generic.get("project_id");
+            String t = (String) generic.get("turtle");
 
             // id=0 if null
             if (p == null) p = 0;
