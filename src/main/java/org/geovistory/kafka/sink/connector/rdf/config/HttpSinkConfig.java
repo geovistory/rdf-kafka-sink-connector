@@ -594,7 +594,7 @@ public class HttpSinkConfig extends AbstractConfig {
     }
 
     public String getHttpHeadersAuthorizationConfig() {
-        return String.valueOf(getPassword(HTTP_HEADERS_AUTHORIZATION_CONFIG));
+        return getPassword(HTTP_HEADERS_AUTHORIZATION_CONFIG).value();
     }
 
     public final Long kafkaRetryBackoffMs() {

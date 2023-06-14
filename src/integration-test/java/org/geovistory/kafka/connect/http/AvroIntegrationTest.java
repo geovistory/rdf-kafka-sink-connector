@@ -18,6 +18,7 @@ package org.geovistory.kafka.connect.http;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,11 @@ import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -41,6 +47,8 @@ import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.config.TopicConfig;
 import org.geovistory.kafka.sink.connector.rdf.HttpSinkConnector;
 import org.geovistory.toolbox.streams.avro.Operation;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,8 +187,8 @@ public class AvroIntegrationTest {
     }
 
     @Test
-    @Timeout(30)
-    final void testBasicDelivery() throws ExecutionException, InterruptedException {
+    // @Timeout(30)
+    final void testBasicDelivery() throws ExecutionException, InterruptedException, IOException {
 
         connectRunner.createConnector(basicConnectorConfig());
 
@@ -200,6 +208,22 @@ public class AvroIntegrationTest {
         for (final Future<RecordMetadata> sendFuture : sendFutures) {
             sendFuture.get();
         }
+
+        TimeUnit.SECONDS.sleep(10);
+
+        // get a list of fuseki datasets
+        HttpUriRequest request = new HttpGet(fusekiUrl + "/$/datasets");
+        String base64 = Base64.getEncoder().encodeToString(("admin:" + adminPw).getBytes(StandardCharsets.UTF_8));
+        request.addHeader("Authorization", "Basic " + base64);
+        // When
+
+        HttpResponse response = HttpClientBuilder.create().build().execute(request);
+        String json = EntityUtils.toString(response.getEntity());
+        var jsonObject = new JSONObject(json);
+        var datasets = new JSONArray(jsonObject.get("datasets").toString());
+        // assert it returns the 9 datasets plus the default dataset
+        assertThat(datasets.length()).isEqualTo(10);
+
 
     }
 

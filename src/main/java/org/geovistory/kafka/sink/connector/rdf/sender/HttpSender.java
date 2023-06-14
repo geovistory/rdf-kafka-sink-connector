@@ -90,9 +90,13 @@ public class HttpSender {
                     if (code == ResponseSenderCode.DATASET_NOT_EXISTING) {
                         DatasetHandler.createFusekiDataset(config.getDatasetName(projectId), config.getHttpUrlConfig(), config.getHttpHeadersAuthorizationConfig());
                         remainRetries++;
+                        throw new Exception("Dataset was not existing. Created dataset.");
+                    }
+                    if (!code.equals(200)) {
+                        throw new Exception("Error sending record " + response);
                     }
                     return response;
-                } catch (final IOException e) {
+                } catch (final Exception e) {
                     log.info("Sending failed, will retry in {} ms ({} retries remain)",
                             config.retryBackoffMs(), remainRetries, e);
                     remainRetries -= 1;
