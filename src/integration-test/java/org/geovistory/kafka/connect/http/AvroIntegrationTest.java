@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
@@ -83,7 +84,7 @@ public class AvroIntegrationTest {
 
     private static File pluginsDir;
 
-    private static final String DEFAULT_TAG = "6.0.2";
+    private static final String DEFAULT_TAG = "7.4.0";
 
     private static final DockerImageName DEFAULT_IMAGE_NAME =
             DockerImageName.parse("confluentinc/cp-kafka").withTag(DEFAULT_TAG);
@@ -212,7 +213,7 @@ public class AvroIntegrationTest {
         config.put("value.converter", "io.confluent.connect.avro.AvroConverter");
         config.put("value.converter.schema.registry.url", schemaRegistryUrl);
         config.put("tasks.max", "1");
-        config.put("http.url", "http://" + fuseki.getHost() + ":" + fuseki.getFirstMappedPort() + HTTP_PATH);
+        config.put("http.url", "http://" + fuseki.getHost() + ":" + fuseki.getFirstMappedPort());
         config.put("http.endpoint", "api_v1_community_data");
         config.put("http.projects.endpoint", "api_v1_project_");
         config.put("http.authorization.type", HTTP_AUTHORIZATION_TYPE_CONFIG);

@@ -33,6 +33,7 @@ public class DatasetHandler {
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "text/turtle");
         connection.setRequestProperty("Authorization", "Basic " + base64);
+        //connection.setRequestProperty("Authorization", "Basic YWRtaW46cHc=");
 
         try {
             OutputStream outputStream = connection.getOutputStream();
