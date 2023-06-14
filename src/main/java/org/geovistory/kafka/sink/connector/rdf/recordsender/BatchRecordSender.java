@@ -19,7 +19,6 @@ package org.geovistory.kafka.sink.connector.rdf.recordsender;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.geovistory.toolbox.streams.avro.Operation;
@@ -36,11 +35,11 @@ final class BatchRecordSender extends RecordSender {
     private final String batchSeparator;
     private static final Logger log = LoggerFactory.getLogger(BatchRecordSender.class);
 
-    protected BatchRecordSender(final HttpSender httpSender,
-                                final int batchMaxSize,
-                                final String batchPrefix,
-                                final String batchSuffix,
-                                final String batchSeparator) {
+    BatchRecordSender(final HttpSender httpSender,
+                      final int batchMaxSize,
+                      final String batchPrefix,
+                      final String batchSuffix,
+                      final String batchSeparator) {
         super(httpSender);
         this.batchMaxSize = batchMaxSize;
         this.batchPrefix = batchPrefix;
@@ -51,8 +50,9 @@ final class BatchRecordSender extends RecordSender {
     @Override
     public void send(final Collection<SinkRecord> records) {
         log.info("Preparing batches...");
-        List<List<SinkRecord>> batches = new ArrayList<>();
-        List<SinkRecord> currentBatch = new ArrayList<>(batchMaxSize);
+        List<List<RdfRecord>> batches = new ArrayList<>();
+
+        List<RdfRecord> currentBatch = new ArrayList<>(batchMaxSize);
         Operation currentOperation = null;
         Integer currentProjectId = null;
 
@@ -62,6 +62,8 @@ final class BatchRecordSender extends RecordSender {
 
             var value = recordValueConverter.convert(record);
             var operation = value.getOperation();
+
+            var r = new RdfRecord(key, value);
 
             if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
                 // Create a new batch if:
@@ -78,10 +80,10 @@ final class BatchRecordSender extends RecordSender {
                 // Start a new batch with the current message
                 currentOperation = operation;
                 currentProjectId = projectId;
-                currentBatch.add(record);
+                currentBatch.add(r);
             } else {
                 // Add the message to the current batch
-                currentBatch.add(record);
+                currentBatch.add(r);
             }
         }
 
@@ -89,14 +91,11 @@ final class BatchRecordSender extends RecordSender {
         if (!currentBatch.isEmpty()) {
             batches.add(new ArrayList<>(currentBatch));
         }
-
-        for (List<SinkRecord> batch : batches) {
-            var firstRecord = batch.get(0);
-            var key = recordKeyConverter.convert(firstRecord);
-            var projectId = Integer.toString(key.getProjectId());
-            var value = recordValueConverter.convert(firstRecord);
-            var operation = value.getOperation();
-            final String body = createRequestBody(batch, operation);
+        for (List<RdfRecord> nextBatch : batches) {
+            var firstRecord = nextBatch.get(0);
+            var projectId = Integer.toString(firstRecord.key.getProjectId());
+            var operation = firstRecord.value.getOperation();
+            final String body = createRequestBody(nextBatch, operation, batchPrefix, batchSeparator, batchSuffix);
             httpSender.send(body, projectId);
         }
     }
@@ -106,7 +105,12 @@ final class BatchRecordSender extends RecordSender {
         throw new ConnectException("Don't call this method for batch sending");
     }
 
-    private String createRequestBody(final Collection<SinkRecord> batch, Operation operation) {
+    static String createRequestBody(
+            final Collection<RdfRecord> batch,
+            Operation operation,
+            String batchPrefix,
+            String batchSeparator,
+            String batchSuffix) {
         final StringBuilder result = new StringBuilder();
         if (!batchPrefix.isEmpty()) {
             result.append(batchPrefix);
@@ -118,15 +122,15 @@ final class BatchRecordSender extends RecordSender {
             result.append("update=DELETE DATA { ");
         }
 
-        final Iterator<SinkRecord> it = batch.iterator();
+        final Iterator<RdfRecord> it = batch.iterator();
         if (it.hasNext()) {
-            var key = recordKeyConverter.convert(it.next());
+            var key = it.next().key;
             var turtle = key.getTurtle().stripTrailing();
             result.append(turtle);
             while (it.hasNext()) {
-                key = recordKeyConverter.convert(it.next());
+                key = it.next().key;
                 turtle = key.getTurtle().stripTrailing();
-                if (!result.substring(result.length() - 1).equals(".")) {
+                if (!result.substring(result.length() - 1).equals(batchSeparator)) {
                     result.append(batchSeparator);
                 }
                 result.append(turtle);

@@ -16,44 +16,31 @@
 
 package org.geovistory.kafka.connect.http;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.Admin;
+import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.config.TopicConfig;
 import org.geovistory.kafka.sink.connector.rdf.HttpSinkConnector;
 import org.geovistory.toolbox.streams.avro.Operation;
+import org.geovistory.toolbox.streams.avro.ProjectRdfKey;
+import org.geovistory.toolbox.streams.avro.ProjectRdfValue;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
@@ -61,12 +48,22 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import org.geovistory.toolbox.streams.avro.ProjectRdfKey;
-import org.geovistory.toolbox.streams.avro.ProjectRdfValue;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
+/**
+ * Run the connector in kafka connect and test the integration with
+ * Kafka Broker, Schema Registry and Fuseki
+ */
 @Testcontainers
 public class AvroIntegrationTest {
 
@@ -80,15 +77,7 @@ public class AvroIntegrationTest {
     private static final String TEST_TOPIC = "project-rdf";
     private static final int TEST_TOPIC_PARTITIONS = 4;
 
-    static final String JSON_PATTERN = "{\"name\":\"%s\",\"value\":\"%s\"}";
-
-    /*static final Schema VALUE_RECORD_SCHEMA = new Schema.Parser()
-            .parse("{\"type\":\"record\",\"name\":\"record\","
-                    + "\"fields\":["
-                    + "{\"name\":\"name\",\"type\":\"string\"}, "
-                    + "{\"name\":\"value\",\"type\":\"string\"}]}");*/
-
-    private String schemaRegistryUrl = "https://schema-registry.geovistory.org/";
+    private final String schemaRegistryUrl = "https://schema-registry.geovistory.org/";
 
     private static File pluginsDir;
 
@@ -108,7 +97,8 @@ public class AvroIntegrationTest {
     private ConnectRunner connectRunner;
 
     private String fusekiUrl;
-    private String adminPw = "pw";
+    private final String adminPw = "pw";
+
     @Container
     private GenericContainer fuseki = new GenericContainer(DockerImageName.parse("ghcr.io/geovistory/fuseki-geosparql:v2.1.0"))
             .withEnv("ADMIN_PASSWORD", adminPw)
@@ -133,7 +123,7 @@ public class AvroIntegrationTest {
     }
 
     @BeforeEach
-    void setUp() throws ExecutionException, InterruptedException {
+    void setUp() {
         String address = fuseki.getHost();
         Integer port = fuseki.getFirstMappedPort();
         fusekiUrl = "http://" + address + ":" + port;
@@ -186,23 +176,87 @@ public class AvroIntegrationTest {
         fuseki.stop();
     }
 
+    /**
+     * Test the single record sender
+     *
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws IOException
+     */
     @Test
-    // @Timeout(30)
-    final void testBasicDelivery() throws ExecutionException, InterruptedException, IOException {
+    @Timeout(30)
+    final void testSingleMode() throws ExecutionException, InterruptedException, IOException {
+        var config = basicConnectorConfig();
+        config.put("batching.enabled", "false");
+        connectRunner.createConnector(config);
 
-        connectRunner.createConnector(basicConnectorConfig());
-
-        final List<String> expectedBodies = new ArrayList<>();
         final List<Future<RecordMetadata>> sendFutures = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
+
+        // insert 10 triples
+        for (int i = 0; i < 10; i++) {
             for (int partition = 0; partition < TEST_TOPIC_PARTITIONS; partition++) {
                 final String ttl = "<foo" + i + "> <has> <bar>";
-                final int projectId = i / 100;
+
+                // insert the first 6 to project 11, the rest in 99
+                final int projectId = i < 6 ? 11 : 99;
                 final var operation = Operation.insert;
                 final var record = createRecord(ttl, projectId, operation);
-                //expectedBodies.add(String.format(JSON_PATTERN, projectId, operation));
                 sendFutures.add(sendMessageAsync(record));
             }
+        }
+        producer.flush();
+        for (final Future<RecordMetadata> sendFuture : sendFutures) {
+            sendFuture.get();
+        }
+
+
+        TimeUnit.SECONDS.sleep(10);
+
+        // get a list of fuseki datasets
+        JSONArray datasets = getListOfDatasets();
+
+        // get all triples in project 99
+        JSONArray triples99 = sparql("api_v1_project_99", "SELECT * WHERE { ?sub ?pred ?obj . }");
+
+        // get all triples in project 11
+        JSONArray triples11 = sparql("api_v1_project_11", "SELECT * WHERE { ?sub ?pred ?obj . }");
+
+
+        // assert it returns the 2 created datasets plus the default dataset
+        assertThat(datasets.length()).isEqualTo(3);
+
+        // assert project 11 has 6 triples
+        assertThat(triples11.length()).isEqualTo(6);
+
+        // assert project 99 has 4 triples
+        assertThat(triples99.length()).isEqualTo(4);
+
+
+    }
+
+    /**
+     * Test the batch record sender
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    @Test
+    @Timeout(30)
+    final void testBatchMode() throws ExecutionException, InterruptedException, IOException {
+        var config = basicConnectorConfig();
+        config.put("batching.enabled", "true");
+        connectRunner.createConnector(config);
+        final List<Future<RecordMetadata>> sendFutures = new ArrayList<>();
+
+        for (int i = 0; i < 1000; i++) {
+            // for (int partition = 0; partition < TEST_TOPIC_PARTITIONS; partition++) {
+            final String ttl = "<foo" + i + "> <has> <bar>";
+            final int projectId = i / 100;
+            final var operation = Operation.insert;
+            final var record = createRecord(ttl, projectId, operation);
+            //expectedBodies.add(String.format(JSON_PATTERN, projectId, operation));
+            sendFutures.add(sendMessageAsync(record));
+            //}
         }
         producer.flush();
         for (final Future<RecordMetadata> sendFuture : sendFutures) {
@@ -212,6 +266,21 @@ public class AvroIntegrationTest {
         TimeUnit.SECONDS.sleep(10);
 
         // get a list of fuseki datasets
+        JSONArray datasets = getListOfDatasets();
+
+        // get all triples in project 1
+        JSONArray triples1 = sparql("api_v1_project_1", "SELECT * WHERE { ?sub ?pred ?obj . }");
+
+        // assert it returns the 10 created datasets plus the default dataset
+        assertThat(datasets.length()).isEqualTo(11);
+
+        // assert project 1 has 100 triples
+        assertThat(triples1.length()).isEqualTo(100);
+
+    }
+
+    @NotNull
+    private JSONArray getListOfDatasets() throws IOException {
         HttpUriRequest request = new HttpGet(fusekiUrl + "/$/datasets");
         String base64 = Base64.getEncoder().encodeToString(("admin:" + adminPw).getBytes(StandardCharsets.UTF_8));
         request.addHeader("Authorization", "Basic " + base64);
@@ -221,10 +290,23 @@ public class AvroIntegrationTest {
         String json = EntityUtils.toString(response.getEntity());
         var jsonObject = new JSONObject(json);
         var datasets = new JSONArray(jsonObject.get("datasets").toString());
-        // assert it returns the 9 datasets plus the default dataset
-        assertThat(datasets.length()).isEqualTo(10);
+        return datasets;
+    }
 
+    @NotNull
+    private JSONArray sparql(String datasetName, String sparqlSelect) throws IOException {
+        HttpUriRequest request = new HttpPost(fusekiUrl + "/" + datasetName + "?query=" + URLEncoder.encode(sparqlSelect));
+        request.addHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.addHeader("Accept", "application/sparql-results+json");
 
+        String base64 = Base64.getEncoder().encodeToString(("admin:" + adminPw).getBytes(StandardCharsets.UTF_8));
+        request.addHeader("Authorization", "Basic " + base64);
+
+        HttpResponse response = HttpClientBuilder.create().build().execute(request);
+        String json = EntityUtils.toString(response.getEntity());
+        var jsonObject = new JSONObject(json);
+        var bindings = jsonObject.getJSONObject("results").getJSONArray("bindings");
+        return bindings;
     }
 
     private Map<String, String> basicConnectorConfig() {
@@ -243,6 +325,10 @@ public class AvroIntegrationTest {
         config.put("http.authorization.type", HTTP_AUTHORIZATION_TYPE_CONFIG);
         config.put("http.headers.authorization", AUTHORIZATION);
         config.put("http.headers.content.type", CONTENT_TYPE);
+        config.put("retry.backoff.ms", "100");
+        config.put("batching.enabled", "true");
+        config.put("batch.separator", ".");
+
         return config;
     }
 
