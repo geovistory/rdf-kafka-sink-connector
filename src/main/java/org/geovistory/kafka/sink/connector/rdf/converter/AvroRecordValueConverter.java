@@ -16,10 +16,7 @@
 
 package org.geovistory.kafka.sink.connector.rdf.converter;
 
-import io.confluent.connect.avro.AvroData;
-import io.confluent.connect.avro.AvroDataConfig;
-import org.apache.avro.generic.GenericData;
-import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.toolbox.streams.avro.Operation;
 import org.geovistory.toolbox.streams.avro.ProjectRdfValue;
@@ -28,18 +25,12 @@ import org.slf4j.LoggerFactory;
 
 class AvroRecordValueConverter implements RecordValueConverter.Converter {
     private static final Logger log = LoggerFactory.getLogger(AvroRecordValueConverter.class);
-    private final AvroData avroData = new AvroData(new AvroDataConfig.Builder()
-            .with(AvroDataConfig.SCHEMAS_CACHE_SIZE_CONFIG, 1000)
-            .with(AvroDataConfig.ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG, true)
-            .build());
-
-    private final Schema projectRdfValueSchema = avroData.toConnectSchema(ProjectRdfValue.SCHEMA$);
 
     @Override
     public ProjectRdfValue convert(final SinkRecord record) {
         try {
-            var gerneric = (GenericData.Record) avroData.fromConnectData(projectRdfValueSchema, record.value());
-            var operationStr = gerneric.get("operation").toString();
+            var generic = (Struct) record.value();
+            var operationStr = generic.get("operation").toString();
             Operation o = null;
             if (operationStr.equals("insert")) {
                 o = Operation.insert;

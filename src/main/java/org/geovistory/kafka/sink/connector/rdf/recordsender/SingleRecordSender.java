@@ -16,6 +16,7 @@
 
 package org.geovistory.kafka.sink.connector.rdf.recordsender;
 
+import org.apache.jena.atlas.logging.Log;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.geovistory.kafka.sink.connector.rdf.sender.HttpSender;
 import org.geovistory.toolbox.streams.avro.Operation;
@@ -41,7 +42,7 @@ final class SingleRecordSender extends RecordSender {
 
     @Override
     public void send(final SinkRecord record) {
-        log.info(recordKeyConverter.convert(record).toString());
+//        log.info(recordKeyConverter.convert(record).toString());
         prepareAndSendBody(record);
     }
 
@@ -50,14 +51,19 @@ final class SingleRecordSender extends RecordSender {
         var sparqlQuery = "";
         var key = recordKeyConverter.convert(record);
 
-        // TODO handle key==null (log a warning and return)
+        if (key == null) {
+            Log.warn(recordKeyConverter, "Key is null");
+            return;
+        }
 
         var projectId = Integer.toString(key.getProjectId());
         var turtle = key.getTurtle();
 
         var value = recordValueConverter.convert(record);
-        // TODO handle value==null (log a warning and return)
-
+        if (value == null) {
+            Log.warn(recordKeyConverter, "Value is null");
+            return;
+        }
         var operation = value.getOperation();
 
         log.info("operation: " + operation);

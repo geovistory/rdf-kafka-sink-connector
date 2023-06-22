@@ -22,7 +22,6 @@ import org.geovistory.kafka.sink.connector.rdf.fuseki.DatasetHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -86,13 +85,17 @@ public class HttpSender {
                     final var response =
                             httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
                     log.debug("Server replied with status code {} and body {}", response.statusCode(), response.body());
-                    var code = httpResponseHandler.onResponse(response);
-                    if (code == ResponseSenderCode.DATASET_NOT_EXISTING) {
+                    var errorCode = httpResponseHandler.onResponse(response);
+                    if (errorCode == ResponseSenderCode.DATASET_NOT_EXISTING) {
                         DatasetHandler.createFusekiDataset(config.getDatasetName(projectId), config.getHttpUrlConfig(), config.getHttpHeadersAuthorizationConfig());
                         remainRetries++;
+                        throw new Exception("Dataset was not existing. Created dataset.");
+                    }
+                    if (errorCode != null) {
+                        throw new Exception("Error sending record " + response);
                     }
                     return response;
-                } catch (final IOException e) {
+                } catch (final Exception e) {
                     log.info("Sending failed, will retry in {} ms ({} retries remain)",
                             config.retryBackoffMs(), remainRetries, e);
                     remainRetries -= 1;
