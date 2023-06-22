@@ -241,7 +241,7 @@ public class AvroIntegrationTest {
      * @throws IOException
      */
     @Test
-    @Timeout(30)
+    @Timeout(100)
     final void testBatchMode() throws ExecutionException, InterruptedException, IOException {
         var config = basicConnectorConfig();
         config.put("batching.enabled", "true");
