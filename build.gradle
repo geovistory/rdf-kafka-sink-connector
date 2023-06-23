@@ -43,6 +43,9 @@ distributions {
         contents {
             from jar
             from configurations.runtimeClasspath
+            into('src/main/resources/') {
+                from { 'src/main/resources/' }
+            }
         }
     }
 }

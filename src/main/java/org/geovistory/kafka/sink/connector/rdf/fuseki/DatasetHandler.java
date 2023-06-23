@@ -57,8 +57,8 @@ public class DatasetHandler {
     }
 
     private static String prepareTemplate(String datasetName) throws IOException {
-        File templateFile = new File("src/main/resources/datasetTemplate.ttl");
-        BufferedReader reader = new BufferedReader(new FileReader(templateFile));
+        InputStream inputStream = DatasetHandler.class.getResourceAsStream("/datasetTemplate.ttl");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder stringBuilder = new StringBuilder();
         String line;
 
