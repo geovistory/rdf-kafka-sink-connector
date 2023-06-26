@@ -71,8 +71,10 @@ public class DatasetHandler {
 
         String result = stringBuilder.toString();
         String templateFilePath = "./tmp/template-" + datasetName;
+        File tmpDir = new File("./tmp");
+        tmpDir.mkdirs();
+
         File outputFile = new File(templateFilePath);
-        outputFile.getParentFile().mkdirs();
         outputFile.createNewFile();
         outputFile.setWritable(true);
 
