@@ -16,11 +16,6 @@
 
 package org.geovistory.kafka.connect.http;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.connect.connector.policy.AllConnectorClientConfigOverridePolicy;
 import org.apache.kafka.connect.runtime.Connect;
@@ -37,9 +32,13 @@ import org.apache.kafka.connect.runtime.standalone.StandaloneHerder;
 import org.apache.kafka.connect.storage.MemoryOffsetBackingStore;
 import org.apache.kafka.connect.util.Callback;
 import org.apache.kafka.connect.util.FutureCallback;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 final class ConnectRunner {
     private static final Logger log = LoggerFactory.getLogger(ConnectRunner.class);
@@ -68,7 +67,8 @@ final class ConnectRunner {
         workerProps.put("value.converter", "org.apache.kafka.connect.converters.ByteArrayConverter");
         workerProps.put("internal.key.converter.schemas.enable", "false");
         workerProps.put("internal.value.converter.schemas.enable", "false");
-
+        workerProps.put(StandaloneConfig.REST_ADVERTISED_PORT_CONFIG, "38083");
+        workerProps.put(StandaloneConfig.LISTENERS_CONFIG, "http://:38083");
         // Don't need it since we'll memory MemoryOffsetBackingStore.
         workerProps.put("offset.storage.file.filename", "");
 
@@ -80,12 +80,12 @@ final class ConnectRunner {
         final Plugins plugins = new Plugins(workerProps);
         final StandaloneConfig config = new StandaloneConfig(workerProps);
 
-        final AllConnectorClientConfigOverridePolicy allConnectorClientConfigOverridePolicy = 
-                    new AllConnectorClientConfigOverridePolicy();
+        final AllConnectorClientConfigOverridePolicy allConnectorClientConfigOverridePolicy =
+                new AllConnectorClientConfigOverridePolicy();
 
         final Worker worker = new Worker(
-            workerId, time, plugins, config, new MemoryOffsetBackingStore(),
-            allConnectorClientConfigOverridePolicy);
+                workerId, time, plugins, config, new MemoryOffsetBackingStore(),
+                allConnectorClientConfigOverridePolicy);
         herder = new StandaloneHerder(worker, "cluster-id", allConnectorClientConfigOverridePolicy);
 
         final RestClient client = new RestClient(config);
@@ -101,29 +101,21 @@ final class ConnectRunner {
         assert herder != null;
 
         final FutureCallback<Herder.Created<ConnectorInfo>> cb = new FutureCallback<>(
-            new Callback<Herder.Created<ConnectorInfo>>() {
-                @Override
-                public void onCompletion(final Throwable error, final Herder.Created<ConnectorInfo> info) {
+                (error, info) -> {
                     if (error != null) {
                         log.error("Failed to create job");
                     } else {
                         log.info("Created connector {}", info.result().name());
                     }
-                }
-            });
+                });
         herder.putConnectorConfig(
-            config.get(ConnectorConfig.NAME_CONFIG),
-            config, false, cb
+                config.get(ConnectorConfig.NAME_CONFIG),
+                config, false, cb
         );
 
         final Herder.Created<ConnectorInfo> connectorInfoCreated = cb.get();
         assert connectorInfoCreated.created();
     }
-
-    ConnectorStateInfo connectorState(final String connectorName) {
-        return herder.connectorStatus(connectorName);
-    }
-
     void stop() {
         connect.stop();
     }

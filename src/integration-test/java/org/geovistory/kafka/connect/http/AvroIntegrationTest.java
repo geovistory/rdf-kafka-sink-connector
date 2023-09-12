@@ -42,10 +42,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.redpanda.RedpandaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
@@ -66,8 +66,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Testcontainers
 public class AvroIntegrationTest {
-
-    private static final String HTTP_PATH = "/api_v1_community_data";
     private static final String HTTP_AUTHORIZATION_TYPE_CONFIG = "static";
     private static final String AUTHORIZATION = "admin:pw";
     private static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -77,17 +75,13 @@ public class AvroIntegrationTest {
     private static final String TEST_TOPIC = "project-rdf";
     private static final int TEST_TOPIC_PARTITIONS = 4;
 
-    private final String schemaRegistryUrl = "https://schema-registry.geovistory.org/";
-
     private static File pluginsDir;
 
-    private static final String DEFAULT_TAG = "7.4.0";
-
     private static final DockerImageName DEFAULT_IMAGE_NAME =
-            DockerImageName.parse("confluentinc/cp-kafka").withTag(DEFAULT_TAG);
+            DockerImageName.parse("docker.redpanda.com/redpandadata/redpanda:v23.1.2");
 
     @Container
-    private final KafkaContainer kafka = new KafkaContainer(DEFAULT_IMAGE_NAME)
+    private final RedpandaContainer redpandaContainer = new RedpandaContainer(DEFAULT_IMAGE_NAME)
             .withNetwork(Network.newNetwork())
             .withEnv("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "false");
 
@@ -129,14 +123,14 @@ public class AvroIntegrationTest {
         fusekiUrl = "http://" + address + ":" + port;
 
         final Properties adminClientConfig = new Properties();
-        adminClientConfig.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers());
+        adminClientConfig.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, redpandaContainer.getBootstrapServers());
 
         final Map<String, Object> producerProps = Map.of(
-                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers(),
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, redpandaContainer.getBootstrapServers(),
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer",
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer",
                 ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "1",
-                "schema.registry.url", schemaRegistryUrl
+                "schema.registry.url", redpandaContainer.getSchemaRegistryAddress()
         );
         producer = new KafkaProducer<>(producerProps);
 
@@ -161,7 +155,7 @@ public class AvroIntegrationTest {
             throw new RuntimeException(e);
         }
 
-        connectRunner = new ConnectRunner(pluginsDir, kafka.getBootstrapServers());
+        connectRunner = new ConnectRunner(pluginsDir, redpandaContainer.getBootstrapServers());
         connectRunner.start();
     }
 
@@ -315,9 +309,9 @@ public class AvroIntegrationTest {
         config.put("connector.class", HttpSinkConnector.class.getName());
         config.put("topics", TEST_TOPIC);
         config.put("key.converter", "io.confluent.connect.avro.AvroConverter");
-        config.put("key.converter.schema.registry.url", schemaRegistryUrl);
+        config.put("key.converter.schema.registry.url", redpandaContainer.getSchemaRegistryAddress());
         config.put("value.converter", "io.confluent.connect.avro.AvroConverter");
-        config.put("value.converter.schema.registry.url", schemaRegistryUrl);
+        config.put("value.converter.schema.registry.url", redpandaContainer.getSchemaRegistryAddress());
         config.put("tasks.max", "1");
         config.put("http.url", "http://" + fuseki.getHost() + ":" + fuseki.getFirstMappedPort());
         config.put("http.endpoint", "api_v1_community_data");
@@ -338,7 +332,7 @@ public class AvroIntegrationTest {
         ProjectRdfKey key = ProjectRdfKey.newBuilder().setProjectId(projectId).setTurtle(ttl).build();
         ProjectRdfValue value = ProjectRdfValue.newBuilder().setOperation(operation).build();
 
-        return new ProducerRecord<ProjectRdfKey, ProjectRdfValue>("project-rdf", key, value);
+        return new ProducerRecord<>("project-rdf", key, value);
     }
 
     private Future<RecordMetadata> sendMessageAsync(final ProducerRecord record) {

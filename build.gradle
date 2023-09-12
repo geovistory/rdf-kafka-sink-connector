@@ -134,7 +134,7 @@ dependencies {
     integrationTestImplementation 'org.eclipse.jetty:jetty-client:9.4.39.v20210325'
     integrationTestImplementation "junit:junit:4.13.2" // This is for testcontainers
     integrationTestImplementation "org.testcontainers:junit-jupiter:1.18.3"
-    integrationTestImplementation "org.testcontainers:kafka:1.18.3" // this is not Kafka version
+    integrationTestImplementation "org.testcontainers:redpanda:1.19.0"
     integrationTestImplementation "org.testcontainers:testcontainers:1.18.3"
     integrationTestImplementation "org.awaitility:awaitility:4.2.0"
 
