@@ -17,7 +17,7 @@ public class DatasetHandler {
      * @param fusekiUrl             the URL of the fuseki instance
      * @param httpHeadersAuthConfig auth config to log into Fuseki
      * @return response code of the request
-     * @throws IOException          IOexception
+     * @throws IOException IOexception
      */
     public static int createFusekiDataset(String datasetName, String fusekiUrl, String httpHeadersAuthConfig) throws IOException {
         System.out.println("createFusekiDataset  " + datasetName + "...");
@@ -38,8 +38,7 @@ public class DatasetHandler {
         try {
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(blob);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             Log.error(e, e.getMessage());
         }
 
@@ -69,20 +68,30 @@ public class DatasetHandler {
 
         reader.close();
 
-        String result = stringBuilder.toString();
-        String templateFilePath = "./tmp/template-" + datasetName;
-        File tmpDir = new File("./tmp");
-        tmpDir.mkdirs();
-
+        String templateFilePath = "/tmp/kafka/template-" + datasetName;
         File outputFile = new File(templateFilePath);
-        outputFile.createNewFile();
+        File parentDir = outputFile.getParentFile();
+
+        if (parentDir != null && !parentDir.exists()) {
+            if (!parentDir.mkdirs()) {
+                throw new IOException("Failed to create parent directory: " + parentDir.getAbsolutePath());
+            }
+        }
+
+        if (!outputFile.exists()) {
+            if (!outputFile.createNewFile()) {
+                throw new IOException("Failed to create output file: " + outputFile.getAbsolutePath());
+            }
+        }
+
         outputFile.setWritable(true);
 
         // Write the modified template to the output file
         FileWriter writer = new FileWriter(outputFile);
-        writer.write(result);
+        writer.write(stringBuilder.toString());
         writer.close();
 
         return templateFilePath;
     }
+
 }
