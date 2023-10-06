@@ -23,6 +23,8 @@ import org.geovistory.toolbox.streams.avro.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 final class SingleRecordSender extends RecordSender {
@@ -57,7 +59,7 @@ final class SingleRecordSender extends RecordSender {
         }
 
         var projectId = Integer.toString(key.getProjectId());
-        var turtle = key.getTurtle();
+        var turtle = URLEncoder.encode(key.getTurtle(), StandardCharsets.UTF_8);
 
         var value = recordValueConverter.convert(record);
         if (value == null) {
