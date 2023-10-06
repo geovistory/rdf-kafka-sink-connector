@@ -128,7 +128,7 @@ final class BatchRecordSender extends RecordSender {
         if (it.hasNext()) {
             var key = it.next().key;
             var turtle = key.getTurtle().stripTrailing();
-            result.append(turtle);
+            result.append(URLEncoder.encode(turtle, StandardCharsets.UTF_8));
             while (it.hasNext()) {
                 key = it.next().key;
                 turtle = URLEncoder.encode(key.getTurtle(), StandardCharsets.UTF_8).stripTrailing();

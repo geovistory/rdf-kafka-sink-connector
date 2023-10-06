@@ -5,6 +5,8 @@ import org.geovistory.toolbox.streams.avro.ProjectRdfKey;
 import org.geovistory.toolbox.streams.avro.ProjectRdfValue;
 import org.junit.jupiter.api.Test;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,8 +29,8 @@ public class BatchRecordSenderTest {
                 ));
 
         String expected = "update=INSERT DATA { " +
-                "<foo> <p> <bar>." +
-                "<foo2> <p> <bar2>" +
+                URLEncoder.encode("<foo> <p> <bar>.", StandardCharsets.UTF_8) +
+                URLEncoder.encode("<foo2> <p> <bar2>", StandardCharsets.UTF_8) +
                 " }";
 
         var result = BatchRecordSender.createRequestBody(batch, Operation.insert, "", ".", "");
