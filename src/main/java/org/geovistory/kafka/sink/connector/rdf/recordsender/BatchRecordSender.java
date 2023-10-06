@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.geovistory.toolbox.streams.avro.Operation;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -126,10 +128,10 @@ final class BatchRecordSender extends RecordSender {
         if (it.hasNext()) {
             var key = it.next().key;
             var turtle = key.getTurtle().stripTrailing();
-            result.append(turtle);
+            result.append(URLEncoder.encode(turtle, StandardCharsets.UTF_8));
             while (it.hasNext()) {
                 key = it.next().key;
-                turtle = key.getTurtle().stripTrailing();
+                turtle = URLEncoder.encode(key.getTurtle(), StandardCharsets.UTF_8).stripTrailing();
                 if (!result.substring(result.length() - 1).equals(batchSeparator)) {
                     result.append(batchSeparator);
                 }

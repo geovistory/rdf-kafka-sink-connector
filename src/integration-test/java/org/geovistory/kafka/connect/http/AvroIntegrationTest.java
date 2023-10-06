@@ -230,6 +230,7 @@ public class AvroIntegrationTest {
 
     /**
      * Test the batch record sender
+     *
      * @throws ExecutionException
      * @throws InterruptedException
      * @throws IOException
@@ -270,6 +271,57 @@ public class AvroIntegrationTest {
 
         // assert project 1 has 100 triples
         assertThat(triples1.length()).isEqualTo(100);
+
+    }
+
+    @Test
+    @Timeout(100)
+    final void testSpecialChar() throws ExecutionException, InterruptedException, IOException {
+        var config = basicConnectorConfig();
+        config.put("batching.enabled", "false");
+        connectRunner.createConnector(config);
+
+        final List<Future<RecordMetadata>> sendFutures = new ArrayList<>();
+
+        // insert 10 triples
+        for (int i = 0; i < 10; i++) {
+            for (int partition = 0; partition < TEST_TOPIC_PARTITIONS; partition++) {
+                final String ttl = "<http://geovistory.org/resource/i1261364> <http://www.w3.org/2000/01/rdf-schema#label> \"foo &" + i + "\"^^<http://www.w3.org/2001/XMLSchema#string> ";
+
+                // insert the first 6 to project 11, the rest in 99
+                final int projectId = i < 6 ? 11 : 99;
+                final var operation = Operation.insert;
+                final var record = createRecord(ttl, projectId, operation);
+                sendFutures.add(sendMessageAsync(record));
+            }
+        }
+        producer.flush();
+        for (final Future<RecordMetadata> sendFuture : sendFutures) {
+            sendFuture.get();
+        }
+
+
+        TimeUnit.SECONDS.sleep(10);
+
+        // get a list of fuseki datasets
+        JSONArray datasets = getListOfDatasets();
+
+        // get all triples in project 99
+        JSONArray triples99 = sparql("api_v1_project_99", "SELECT * WHERE { ?sub ?pred ?obj . }");
+
+        // get all triples in project 11
+        JSONArray triples11 = sparql("api_v1_project_11", "SELECT * WHERE { ?sub ?pred ?obj . }");
+
+
+        // assert it returns the 2 created datasets plus the default dataset
+        assertThat(datasets.length()).isEqualTo(3);
+
+        // assert project 11 has 6 triples
+        assertThat(triples11.length()).isEqualTo(6);
+
+        // assert project 99 has 4 triples
+        assertThat(triples99.length()).isEqualTo(4);
+
 
     }
 
