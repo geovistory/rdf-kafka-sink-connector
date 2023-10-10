@@ -1,4 +1,4 @@
-name: Releases
+name: Releases snapshot version
 
 on:
   workflow_dispatch:
