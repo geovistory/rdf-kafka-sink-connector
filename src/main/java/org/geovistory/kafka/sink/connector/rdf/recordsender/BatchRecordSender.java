@@ -51,7 +51,7 @@ final class BatchRecordSender extends RecordSender {
 
     @Override
     public void send(final Collection<SinkRecord> records) {
-        log.info("Preparing batches...");
+        log.info("Preparing batches from " + records.size() + " consumed records...");
         List<List<RdfRecord>> batches = new ArrayList<>();
 
         List<RdfRecord> currentBatch = new ArrayList<>(batchMaxSize);
