@@ -28,7 +28,7 @@ plugins {
 group 'org.geovistory'
 
 version = "1.0.1"
-//apply plugin: "com.dipien.semantic-version"
+apply plugin: "com.dipien.semantic-version"
 
 
 repositories {
