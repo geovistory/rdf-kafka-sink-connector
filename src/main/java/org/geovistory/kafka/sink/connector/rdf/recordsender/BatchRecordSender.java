@@ -98,6 +98,7 @@ final class BatchRecordSender extends RecordSender {
             var projectId = Integer.toString(firstRecord.key.getProjectId());
             var operation = firstRecord.value.getOperation();
             final String body = createRequestBody(nextBatch, operation, batchPrefix, batchSeparator, batchSuffix);
+            log.info("Sending " + nextBatch.size() + " records for project " + projectId + "...");
             httpSender.send(body, projectId);
         }
     }
