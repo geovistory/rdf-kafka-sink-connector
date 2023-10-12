@@ -25,10 +25,7 @@ import org.geovistory.toolbox.streams.avro.Operation;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 final class BatchRecordSender extends RecordSender {
     private final int batchMaxSize;
@@ -54,9 +51,17 @@ final class BatchRecordSender extends RecordSender {
         log.info("Preparing batches from " + records.size() + " consumed records...");
         List<List<RdfRecord>> batches = new ArrayList<>();
 
+        Map<Integer, List<RdfRecord>> insertBatchesByProject = null; // buffer of insert batches grouped by projectId
+        Map<Integer, List<RdfRecord>> deleteBatchesByProject = null; // buffer of delete batches grouped by projectId
+
         List<RdfRecord> currentBatch = new ArrayList<>(batchMaxSize);
         Operation currentOperation = null;
         Integer currentProjectId = null;
+
+        // we iterate over records and group them by project id
+        // thereby we ensure there are never insert and delete records
+        // in the two buffers at the same time. This way we keep the
+        // correct order of operations per dataset.
 
         for (final var record : records) {
             var key = recordKeyConverter.convert(record);
@@ -67,32 +72,51 @@ final class BatchRecordSender extends RecordSender {
 
             var r = new RdfRecord(key, value);
 
-            if (!operation.equals(currentOperation) || !projectId.equals(currentProjectId) || currentBatch.size() >= batchMaxSize) {
-                // Create a new batch if:
-                // - Operation is different from the current batch, or
-                // - Project ID is different from the current batch, or
-                // - Current batch size exceeds the maximum batch size
-
-                if (!currentBatch.isEmpty()) {
-                    // Add the current batch to the list of batches
-                    batches.add(new ArrayList<>(currentBatch));
-                    currentBatch.clear();
+            if (operation == Operation.insert) {
+                // if there is a delete batch for the project id
+                if (deleteBatchesByProject != null && deleteBatchesByProject.containsKey(projectId)) {
+                    // add the delete batch to batches
+                    batches.add(deleteBatchesByProject.get(projectId));
+                    // and clean up
+                    deleteBatchesByProject.remove(projectId);
                 }
 
-                // Start a new batch with the current message
-                currentOperation = operation;
-                currentProjectId = projectId;
-                currentBatch.add(r);
-            } else {
-                // Add the message to the current batch
-                currentBatch.add(r);
+                // if there is no insert batch for the project id
+                if (!insertBatchesByProject.containsKey(projectId)) {
+                    // initialize a new list
+                    insertBatchesByProject.put(projectId, new ArrayList<>());
+                }
+                insertBatchesByProject.get(projectId).add(r);
+            } else if (operation == Operation.delete) {
+                // if there is a insert batch for the project id
+                if (insertBatchesByProject != null && insertBatchesByProject.containsKey(projectId)) {
+                    // add the insert batch to batches
+                    batches.add(insertBatchesByProject.get(projectId));
+                    // and clean up
+                    insertBatchesByProject.remove(projectId);
+                }
+                // if there is no delete batch for the project id
+                if (!deleteBatchesByProject.containsKey(projectId)) {
+                    // initialize a new list
+                    deleteBatchesByProject.put(projectId, new ArrayList<>());
+                }
+                deleteBatchesByProject.get(projectId).add(r);
             }
         }
 
-        // Add the last batch to the list of batches
-        if (!currentBatch.isEmpty()) {
-            batches.add(new ArrayList<>(currentBatch));
+        if (insertBatchesByProject != null) {
+            for (Map.Entry<Integer, List<RdfRecord>> item : insertBatchesByProject.entrySet()) {
+                batches.add(item.getValue());
+            }
         }
+
+        if (deleteBatchesByProject != null) {
+            for (Map.Entry<Integer, List<RdfRecord>> item : deleteBatchesByProject.entrySet()) {
+                batches.add(item.getValue());
+            }
+        }
+
+
         for (List<RdfRecord> nextBatch : batches) {
             var firstRecord = nextBatch.get(0);
             var projectId = Integer.toString(firstRecord.key.getProjectId());
@@ -101,6 +125,7 @@ final class BatchRecordSender extends RecordSender {
             log.info("Sending " + nextBatch.size() + " records for project " + projectId + "...");
             httpSender.send(body, projectId);
         }
+
     }
 
     @Override
