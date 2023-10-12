@@ -48,73 +48,7 @@ final class BatchRecordSender extends RecordSender {
 
     @Override
     public void send(final Collection<SinkRecord> records) {
-        log.info("Preparing batches from " + records.size() + " consumed records...");
-        List<List<RdfRecord>> batches = new ArrayList<>();
-
-        Map<Integer, List<RdfRecord>> insertBatchesByProject = null; // buffer of insert batches grouped by projectId
-        Map<Integer, List<RdfRecord>> deleteBatchesByProject = null; // buffer of delete batches grouped by projectId
-
-        List<RdfRecord> currentBatch = new ArrayList<>(batchMaxSize);
-        Operation currentOperation = null;
-        Integer currentProjectId = null;
-
-        // we iterate over records and group them by project id
-        // thereby we ensure there are never insert and delete records
-        // in the two buffers at the same time. This way we keep the
-        // correct order of operations per dataset.
-
-        for (final var record : records) {
-            var key = recordKeyConverter.convert(record);
-            Integer projectId = key.getProjectId();
-
-            var value = recordValueConverter.convert(record);
-            var operation = value.getOperation();
-
-            var r = new RdfRecord(key, value);
-
-            if (operation == Operation.insert) {
-                // if there is a delete batch for the project id
-                if (deleteBatchesByProject != null && deleteBatchesByProject.containsKey(projectId)) {
-                    // add the delete batch to batches
-                    batches.add(deleteBatchesByProject.get(projectId));
-                    // and clean up
-                    deleteBatchesByProject.remove(projectId);
-                }
-
-                // if there is no insert batch for the project id
-                if (!insertBatchesByProject.containsKey(projectId)) {
-                    // initialize a new list
-                    insertBatchesByProject.put(projectId, new ArrayList<>());
-                }
-                insertBatchesByProject.get(projectId).add(r);
-            } else if (operation == Operation.delete) {
-                // if there is a insert batch for the project id
-                if (insertBatchesByProject != null && insertBatchesByProject.containsKey(projectId)) {
-                    // add the insert batch to batches
-                    batches.add(insertBatchesByProject.get(projectId));
-                    // and clean up
-                    insertBatchesByProject.remove(projectId);
-                }
-                // if there is no delete batch for the project id
-                if (!deleteBatchesByProject.containsKey(projectId)) {
-                    // initialize a new list
-                    deleteBatchesByProject.put(projectId, new ArrayList<>());
-                }
-                deleteBatchesByProject.get(projectId).add(r);
-            }
-        }
-
-        if (insertBatchesByProject != null) {
-            for (Map.Entry<Integer, List<RdfRecord>> item : insertBatchesByProject.entrySet()) {
-                batches.add(item.getValue());
-            }
-        }
-
-        if (deleteBatchesByProject != null) {
-            for (Map.Entry<Integer, List<RdfRecord>> item : deleteBatchesByProject.entrySet()) {
-                batches.add(item.getValue());
-            }
-        }
+        List<List<RdfRecord>> batches = createBatches(records);
 
 
         for (List<RdfRecord> nextBatch : batches) {
@@ -126,6 +60,91 @@ final class BatchRecordSender extends RecordSender {
             httpSender.send(body, projectId);
         }
 
+    }
+
+    public List<List<RdfRecord>> createBatches(Collection<SinkRecord> records) {
+        log.info("Preparing batches from " + records.size() + " consumed records...");
+        List<List<RdfRecord>> batches = new ArrayList<>();
+        Map<Integer, List<RdfRecord>> insertBatchesByProject = new HashMap<>(); // buffer of insert batches grouped by projectId
+        Map<Integer, List<RdfRecord>> deleteBatchesByProject = new HashMap<>(); // buffer of delete batches grouped by projectId
+
+        boolean first = true;
+
+        // we iterate over records and group them by project id
+        // thereby we ensure there are never insert and delete records
+        // in the two buffers at the same time. This way we keep the
+        // correct order of operations per dataset.
+        for (final var record : records) {
+
+            // log offset and partition of the first record
+            if (first) {
+                log.info("First incoming record offset: " + record.kafkaOffset() + ", partition: " + record.kafkaPartition());
+                first = false;
+            }
+
+            var key = recordKeyConverter.convert(record);
+            Integer projectId = key.getProjectId();
+
+            var value = recordValueConverter.convert(record);
+            var operation = value.getOperation();
+
+            var r = new RdfRecord(key, value);
+
+            if (operation == Operation.insert) {
+                // if there is a delete batch for the project id
+                if (deleteBatchesByProject.containsKey(projectId)) {
+                    // add the delete batch to batches
+                    batches.add(deleteBatchesByProject.get(projectId));
+                    // and clean up
+                    deleteBatchesByProject.remove(projectId);
+                }
+                // if max batch size is reached
+                if (insertBatchesByProject.containsKey(projectId) && insertBatchesByProject.get(projectId).size() >= batchMaxSize) {
+                    // add the insert batch to batches
+                    batches.add(insertBatchesByProject.get(projectId));
+                    // and clean up
+                    insertBatchesByProject.remove(projectId);
+                }
+
+                // if there is no insert batch for the project id
+                if (!insertBatchesByProject.containsKey(projectId)) {
+                    // initialize a new list
+                    insertBatchesByProject.put(projectId, new ArrayList<>());
+                }
+
+                insertBatchesByProject.get(projectId).add(r);
+            } else if (operation == Operation.delete) {
+                // if there is a insert batch for the project id
+                if (insertBatchesByProject.containsKey(projectId)) {
+                    // add the insert batch to batches
+                    batches.add(insertBatchesByProject.get(projectId));
+                    // and clean up
+                    insertBatchesByProject.remove(projectId);
+                }
+                // if max batch size is reached
+                if (deleteBatchesByProject.containsKey(projectId) && deleteBatchesByProject.get(projectId).size() >= batchMaxSize) {
+                    // add the delete batch to batches
+                    batches.add(deleteBatchesByProject.get(projectId));
+                    // and clean up
+                    deleteBatchesByProject.remove(projectId);
+                }
+                // if there is no delete batch for the project id
+                if (!deleteBatchesByProject.containsKey(projectId)) {
+                    // initialize a new list
+                    deleteBatchesByProject.put(projectId, new ArrayList<>());
+                }
+                deleteBatchesByProject.get(projectId).add(r);
+            }
+        }
+
+        for (Map.Entry<Integer, List<RdfRecord>> item : insertBatchesByProject.entrySet()) {
+            batches.add(item.getValue());
+        }
+
+        for (Map.Entry<Integer, List<RdfRecord>> item : deleteBatchesByProject.entrySet()) {
+            batches.add(item.getValue());
+        }
+        return batches;
     }
 
     @Override
