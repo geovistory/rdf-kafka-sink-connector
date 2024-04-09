@@ -102,6 +102,7 @@ public final class HttpSinkTask extends SinkTask {
                     }
 
                     try {
+                        log.info("Sending record at offset " + record.kafkaOffset() + "...");
                         recordSender.send(record);
                     } catch (final ConnectException e) {
                         if (reporter != null) {
